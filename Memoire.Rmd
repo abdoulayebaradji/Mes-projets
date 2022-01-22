@@ -1,0 +1,2262 @@
+---
+title: 
+  #\include_graphics("photo62.jpg")
+  \begin{center}
+  \textsc{\LARGE MASTER 2 Mention Mathématiques et Applications Parcours Ingénierie Statistique Numérique - Data sciences}\\[1.5cm]
+  {\huge \bfseries RECHERCHE INTERDISCIPLINAIRE\\ [0.4cm] }
+  \end{center}
+subtitle:  
+  \textsc{\LARGE Analyses quantitatives et qualitatives de données d'enquête pour caractériser la diversité des pratiques et des points de vue sur les modes de fonctionnement de la recherche française avec les Suds face aux enjeux climatiques}
+author: 
+  \begin{minipage}{0.4\textwidth}
+  \begin{flushleft} \large
+    \emph{Auteur:}\\
+    Abdoulaye \textsc{BARADJI}
+  \end{flushleft}
+  \end{minipage}
+  \begin{minipage}{0.4\textwidth}
+  \begin{flushright} \large
+  \emph{Encadré par:} \\
+    Mariline \textsc{POUPAUD}, Doctorante socio-économie de la santé au CIRAD (ASTRE) et à l'université de Liège\\
+    Facundo   \textsc{MUÑOZ}, Biostatisticien - CIRAD\\
+    Stephanie \textsc{CARRIERE}, PhD, HDR, Chargée de Recherche IRD, UMR SENS, en Écologie - Ethnoécologie
+  \end{flushright}
+  \end{minipage}
+documentclass: scrreprt 
+geometry: top=2cm, bottom=2cm, left=2cm, right=2cm #   too much! scrreprt
+output:
+  pdf_document:
+    df_print: kable
+    number_sections: true
+    fig_caption: true
+    citation_package: biblatex
+    includes:
+      in_header: packages.tex
+---
+
+\textbf{Avant-propos}
+
+Ce mémoire rentre dans le cadre de l'obtention du diplôme de Master 2 mention Mathématiques et Applications parcours ingénierie statistique et numérique à l'université de Lille. Il est l'aboutissement de 2 années de formation avec une spécialisation en data sciences. Il présente le travail que j'ai réalisé en tant qu'assistant analyse de données au sein du centre de recherche CIRAD et de l'IRD dans le cadre de la réalisation d'un projet de recherche interdisciplinaire.
+J'avais pour mission d'analyser les données d'enquête par questionnaire préalablement récoltées pour permettre une meilleure compréhension et caractérisation des acteurs de la recherche par rapport aux changements de fonctionnement de la recherche face aux urgences socio-écologique.
+
+\textbf{Résumé}
+
+Les dégradations environnementales d'origine anthropique ont des impacts sociaux majeurs, notamment sur les populations les plus vulnérables de par le monde. Pour des collectifs de chercheurs tels que \textit{le Labo 1p5}, face à ces urgences socio-écologiques, il est impératif en tant que chercheur de contribuer au changement des modes de vie. Cela implique, entre autre, des transformations dans le secteur de la recherche.
+
+Dans cet objectif, une diversité d’initiatives ont vu le jour dans la recherche. Le projet DiFUS-E vise à mieux comprendre les freins et leviers individuels, collectifs et institutionnels pour accompagner la mise en œuvre du changement dans la recherche en coopération avec les pays en développement et émergents de la zone intertropicale (recherche avec les Suds, en raccourci) basée à Montpellier. 
+Dans le cadre de ce projet DiFUS-E, une enquête par questionnaire a circulé auprès des acteurs de la recherche avec les Suds, récoltant $402$ réponses. À partir de l'analyse des résultats d’enquêtes auprès des chercheurs à Montpellier, le projet vise notamment à documenter les points de vue et pratiques des acteurs en mettant en lumière les articulations et synergies possibles entre les perspectives de changement aux niveaux individuel, collectif et institutionnel.
+
+Mon stage s'insère dans le projet DiFUS-E, et nous avons effectué l'analyse des données d'enquêtes afin de caractériser la diversité des pratiques et des points de vue des individus en utilisant des méthodes d'analyse multifactorielle et de classification mais aussi des méthodes de fouille de textes et d'analyse qualitative.
+
+Grâce à ces méthodes d'analyses, nous avons pu aboutir à une typologie d'acteurs avec la mise en évidence de profils-type. Nous avons également pu identifier différentes catégories de points de vue concernant les propositions de transformation des pratiques de recherche.
+
+Ce rapport explique en détails les différentes méthodes utilisées afin de caractériser ces profils d'acteurs.
+
+Dans le cadre de ce stage, j'ai developpé ma capacité à travailler en équipe et surtout à interagir avec des personnes de différentes disciplines (biostatistique mais aussi anthropologie, économie, écologie ou encore épidémiologie) faisant partie du projet DiFUS-E. J'ai aussi developpé des compétences en analyses qualitatives de texte et pu mettre en application des méthodologies d'analyses multifactorielles et de classifications apprises pendant mon master.
+Ces expériences acquises me permettront d'exercer pleinement mon métier de data scientist.
+
+\newpage
+\textbf{Remerciements}
+
+Ce mémoire est l'aboutissement d'un parcours universitaire réalisé en France, riche intellectuellement et humainement. De l'université de Paris Diderot à l'université de Lille, j'ai pu acquérir des connaissances techniques et des qualités humaines qui me serviront pour la suite.
+
+Je tiens à remercier dans un premier temps Madame Mariline Poupaud (CIRAD, UMR ASTRE), Madame Stéphanie Carrière (IRD, UMR SENS) et Monsieur Facundo Muñoz (CIRAD, UMR ASTRE) de m'avoir accueilli au sein de leurs équipe. Le projet fut pour moi une belle opportunité qui m'a permis de découvrir le secteur des sciences sociales et qui me permettra de débuter ma carrière professionnelle.
+
+Je tiens tout particulièrement à témoigner toute ma reconnaissance à Madame Mariline Poupaud et Monsieur Facundo Muñoz pour l'expérience enrichissante et pleine d'intérêt qu'ils m'ont fait vivre pendant ces 6 mois de stage. Je les remercie également pour leur disponibilité et la patience dont ils ont fait preuve à mon égard. Leurs conseils avisés m'ont permis de réaliser mon travail et de réussir les missions qui m'ont été confiées.
+
+Mes remerciements vont également à toute l'équipe du projet DiFUS-E pour la bonne humeur qui y règne et qui m'ont permis de réaliser mon stage dans les conditions optimales malgré la crise sanitaire. Je les remercie pour leur disponibilité et pour l'acceuil.
+
+Je suis reconnaissant à toute l'équipe pédagogique du Master ISN (notamment à Madame Nicole Chapel) pour le suivi et la formation de qualité dispensée.
+
+Je ne saurais terminer sans remercier mes parents pour leur amour inestimable, leur confiance, leur soutien, leurs sacrifices et toutes les valeurs qu'ils ont su m'inculquer et qui ont fait de moi ce que je suis aujourd'hui.
+
+Merci à toutes ces personnes qui ont contribué de près ou de loin à la réalisation de ce projet.
+
+\newpage
+\textbf{Glossaire}
+
+**Di-FUSE** : Diversité Face aux Urgences Socio-Écologiques
+
+**CIRAD** : Centre de coopération internationale en recherche
+
+**IRD** : Institut de recherche pour le développement
+
+**Labo 1p5** : Collectif de membres du monde académique, de toutes disciplines et sur tout le territoire, partageant un objectif commun : mieux comprendre et réduire l'impact des activités de recherche scientifique sur l'environnement, en particulier sur le climat.
+
+**CNRS** : Centre nationale de la recherche scientifique
+
+**INRAE** : Institut national de la recherche agronomique
+
+**RPD** : Recherche pour le développement
+
+\renewcommand\thesection{\ifnum \value{chapter}>0 \thechapter.\fi\arabic{section}}
+\tableofcontents
+\thispagestyle{empty}
+\setcounter{page}{0}
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, include = FALSE, warning= FALSE, message = FALSE)
+```
+
+```{r package}
+library(ggplot2)
+library(readxl)
+library(FactoMineR) ## MCA
+library(factoextra) ## visualisation des graphes
+library(missMDA) ## données manquantes (imputation)
+library(tidyverse) # récodage des catégories
+library(naniar)
+library(corrplot)
+library(cluster)# CAH
+library(knitr)
+library(questionr)
+library(here)
+library(kableExtra)
+# fouille de texte
+library(tm)
+library(readtext)
+library("SnowballC")
+library("wordcloud")
+library("RColorBrewer")
+library(textclean)
+```
+
+```{r data}
+# base de données initiales
+enquete<- read_excel(here::here("data/Enquete.xlsx")) %>% 
+  as.data.frame()
+
+# On enlève les colonnes vides
+enquete1<- enquete[,-c(2,5,6,7,8,9)]
+
+# On enlève toutes les questions ouvertes
+enquete2<- enquete1[,-c(5,7,9,11,13,15,17,19,21,23,25,27,29,31,42,48)]
+
+# on enlève la première ligne qui contient que des NA
+enquete3<- enquete2[-1,]
+```
+
+```{r rename}
+# On procède au renommage de nos variables ainsi : 
+# Q1.? concerne les  questions sur les avis des pratiques collectifs
+# Q2.? concerne les questions sur les avis des pratiques individuels
+# Q3.? les questions concernant les avis sur la position du CIRAD
+# Q4.? concerne les questions socio-démographiques
+names(enquete3)<- c("Respondent.ID", "Start.Date", "End.Date", "Q1.1", 
+                    "Q1.2", 
+                    "Q2.1", 
+                    "Q2.2", 
+                    "Q2.3", 
+                    "Q2.4", 
+                    "Q2.5", 
+                    "Q2.6", 
+                    "Q2.7", 
+                    "Q2.8", 
+                    "Q2.9", 
+                    "Q3.1", 
+                    "Q3.2", 
+                    "Q3.3", 
+                    "Q3.4", 
+                    "Q3.5", "Q3.6", "Q3.7", "Q3.8", "Q3.9", "Q3.10", "Q3.11", 
+                    "Q3.12", "Q3.13", "Q4.1", "Q4.2", 
+                    "Q4.3", "Q4.4", "Q4.5"
+)
+```
+
+```{r data_recatégorisation}
+enquete3.new<- enquete3[,1:3]
+enquete3.new$Q1.1.new <- fct_collapse(enquete3$Q1.1,
+                                  "Pas d’accord" = c("Plutôt pas d’accord"),
+                                  "D'accord" = c("Plutôt d’accord"))
+
+enquete3.new$Q1.2.new <- fct_collapse(enquete3$Q1.2,
+                                  "Pas d’accord" = c("Plutôt pas d’accord"),
+                                  "D'accord" = c("Plutôt d’accord"))
+
+# questions : avis sur les pratiques individuels
+
+enquete3.new$Q2.1.new <- fct_collapse(enquete3$Q2.1,
+                                  "Non" = c("Ne se prononce pas"))
+
+enquete3.new$Q2.2.new <- fct_collapse(enquete3$Q2.2,
+                                  "Non" = c("Ne se prononce pas"))
+
+enquete3.new$Q2.3.new <- fct_collapse(enquete3$Q2.3,
+                                  "Non" = c("Ne se prononce pas"))
+
+enquete3.new$Q2.4.new <- fct_collapse(enquete3$Q2.4,
+                                  "Pvicap" = c("Ne se prononce pas","Pas de voyages internationaux dans le cadre de mes activités professionnelles"),
+                                  "La moitié environ (<20-60%)" = c("Pratiquement aucun en fait (<20%)","Quelques-uns (20-40%)","La moitié environ (40-60%)"))
+enquete3.new$Q2.5<- enquete3[,10]
+enquete3.new$Q2.6.new <- fct_collapse(enquete3$Q2.6,
+                                  "Ne se prononce pas" = c("Je ne sais pas"))
+
+enquete3.new$Q2.7.new <- fct_collapse(enquete3$Q2.7,
+                                  "Oui, partiellement" = c("Oui, faiblement","Oui, moyennement"),
+                                  "Non" = c("Ne se prononce pas"))
+
+enquete3.new$Q2.8.new <- fct_collapse(enquete3$Q2.8,
+                                  "Oui, partiellement" = c("Oui, faiblement","Oui, moyennement"),
+                                  "Non" = c("Ne se prononce pas"))
+
+enquete3.new$Q2.9.new <- fct_collapse(enquete3$Q2.9,
+                                  "Oui, partiellement" = c("Oui, faiblement","Oui, moyennement"),
+                                  "Non" = c("Ne se prononce pas"))
+
+# Questions : Avis sur la position du cirad
+enquete3.new$Q3.1.new <- fct_collapse(enquete3$Q3.1,
+                                  "Pas d’accord" = c("Plutôt pas d’accord"),
+                                  "d'accord" = c("Plutôt d’accord"))
+
+enquete3.new$Q3.2.new <- fct_collapse(enquete3$Q3.2,
+                                  "Pas d’accord" = c("Plutôt pas d’accord"),
+                                  "d'accord" = c("Plutôt d’accord"))
+
+enquete3.new$Q3.3.new <- fct_collapse(enquete3$Q3.3,
+                                  "Pas d’accord" = c("Plutôt pas d’accord"),
+                                  "d'accord" = c("Plutôt d’accord"))
+
+enquete3.new$Q3.4.new <- fct_collapse(enquete3$Q3.4,
+                                  "défavorable" = c("Tout à fait défavorable","Plutôt défavorable","Ne se prononce pas"))
+
+
+enquete3.new$Q3.5.new <- fct_collapse(enquete3$Q3.5,
+                                  "défavorable" = c("Tout à fait défavorable","Plutôt défavorable","Ne se prononce pas"))
+
+enquete3.new$Q3.6.new <- fct_collapse(enquete3$Q3.6,
+                                  "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.7.new <- fct_collapse(enquete3$Q3.7,
+                                  "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.8.new <- fct_collapse(enquete3$Q3.8,
+                                  "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.9.new <- fct_collapse(enquete3$Q3.9,
+                                  "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.10.new <- fct_collapse(enquete3$Q3.10,
+                                   "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.11.new <- fct_collapse(enquete3$Q3.11,
+                                   "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.12.new <- fct_collapse(enquete3$Q3.12,
+                                   "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+enquete3.new$Q3.13.new <- fct_collapse(enquete3$Q3.13,
+                                   "défavorable" = c("Tout à fait défavorable","Plutôt défavorable"))
+
+# Questions : Avis socio-démographiques
+enquete3.new$Q4.1.âge<- enquete3[,28]
+enquete3.new$Q4.2.genre<- enquete3[,29]
+enquete3.new$Q4.3.statut <- fct_collapse(enquete3$Q4.3,
+                                  "Chercheur" = c("cadre","collaborateur"), "Doctorant.e" = c("allocataire de recherche"),"Ingénieur,technicien-admin" = c("agent de maîtrise"))
+
+
+enquete3.new$Q4.4.new<- fct_collapse(enquete3$Q4.4,
+                                 "Chercheur" = c("Chercheuse","dans un autre institut","Maître de Conférences","chargé de recherche","Postdoc"),
+                                 "Doctorant.e" = c("doctorant accueilli","doctorant","Doctorant","doctorante","Doctorante CIFRE","thesard","thésard"),
+                                 "Stagiaire, VSC" = c("stagiaire","Stagiaire","VSC","Volontaire service civique"),
+                                 "Ingénieur,technicien-admin" = c("Assistant ingénieur","CDD","ingénieur","ingenieur d'etude CDD","Ingénieur de recherche","ITA","technicien agricole et pépiniériste"))
+enquete3.new$Q4.5.activite<- enquete3[,32]
+varName <- names(enquete3.new)[!names(enquete3.new)%in%c("Respondent.ID","Start.Date","End.Date")]
+for (v in varName){
+  enquete3.new[,v] <- as.character(enquete3.new[,v])
+}
+
+
+# Remplacer les information "Autre" dans Q4.3.new par celles du Q4.4.new
+# et éliminer la colonne Q4.4
+ind_ligne<- which(enquete3.new$Q4.4.new != "NA")
+enquete3.new$Q4.3.statut[ind_ligne]<- enquete3.new$Q4.4.new[ind_ligne]
+enquete3.new<- enquete3.new[,-31]
+
+# Traitement des réponses particulières en NA
+enquete3.new$Q4.3.statut[223]<- NA
+enquete3.new$Q4.3.statut[25]<- NA
+
+# On enlève les trois premières colonnes qui sont l'identifiant et les dates
+enquete4.new<- enquete3.new[,-c(1,2,3)]
+
+```
+
+
+\section*{Introduction générale}
+\addcontentsline{toc}{section}{Introduction générale}
+
+Les dégradations environnementales d'origine anthropique tels que le changement climatique et le déclin de la biodiversité, ont des impacts sociaux majeurs, notamment sur les populations les plus vulnérables de part le monde.
+
+Pour des collectifs de chercheurs tels que le Labo 1p5 [[\textcolor{red}{Site web}](https://labo1point5.org/)], il est impératif en tant que chercheurs de contribuer au changement des modes de vie qui limiteraient les conséquences des activités humaines sur l'environnement. Cela implique, entre autres, des transformations dans le secteur de la recherche.
+
+Sur la place de Montpellier, des chercheurs et chercheuses de divers organismes de recherche comme le \textit{CIRAD} et \textit{l'IRD}, se sont réunis autour d'un projet de recherche interdisciplinaire nommée DI-FUSE.
+
+Ce projet s'intéresse aux possibilités de changement de modes de fonctionnement de la recherche scientifique en coopération avec les pays en développement et émergents de la zone intertropicale (recherche avec et pour les Suds) face au changement climatique et au déclin de la biodiversité, tout en tenant compte de la montée des inégalités entre pays mais aussi au sein d'un même pays (ce qui est nommé << urgences socio-écologiques >> par ces chercheurs).
+
+Ce stage s’insère dans le cadre du projet Di-FUSE. Il a pour objectif de caractériser la diversité des pratiques et des points de vue des acteurs de la recherche pour et avec les Suds de la place de Montpellier concernant les changements : 
+\begin{itemize}
+  \item des pratiques professionnelles,
+  \item des modes d'organisation et de gouvernance,
+  \item des mandats et orientations de la recherche à mettre en oeuvre.
+\end{itemize}
+
+Le travail consiste à effectuer l'analyse des données d'un questionnaire en ligne ayant circulé de septembre à décembre 2019 auprès des personnes (travaillant dans le secteur de la recherche avec et pour les Suds) du CIRAD, CNRS, INRAE, Univ Montpellier, IRD, Montpellier Suprago et Université Montpellier 3. Ce questionnaire contient à la fois des questions fermées, propices à des méthodologies d'analyse quantitative, et des questions ouvertes sous forme de commentaires libres, propices à des méthodologies d'analyses qualitatives.
+
+Ce rapport est organisé en quatres chapitres. Le premier chapitre est une présentation générale de l'organisme d'accueil et du projet DiFUS-E dans sa globalité. Le deuxième chapitre parle de la présentation des données. Le troisième et quatrième chapitre, coeur de mon travail, abordent les missions que nous avons effectuées ainsi que les méthodes d'analyses utilisées. Ils décrivent respectivement l'analyse des questions fermées et l'analyse des questions ouvertes de la base de données.
+
+\chapter{Chapitre I : Contexte}
+\section{Présentation du CIRAD et de l'IRD}
+
+Le questionnaire ayant circulé au sein des Unités mixtes de recherche du CIRAD, je présente cet organisme de recherche dans ce paragraphe. Les Unités mixtes de recherche du CIRAD regroupent également des membres de l'IRD, CNRS, INRAE, Montpellier Suprago et Université Montpellier 3. De plus le projet Di-FUSE est porté par des chercheurs et chercheuses du CIRAD et de l'IRD, et j'ai été co-encadré par des membres du CIRAD et de l'IRD, je présente donc également l'IRD.
+
+Le Cirad est l'organisme français de recherche agronomique et de coopération internationale pour le développement durable des régions tropicales et méditerranéennes [[\textcolor{red}{lien vers le site web}](https://www.cirad.fr/)].
+
+Avec ses partenaires, le Cirad co-construit des connaissances et des solutions pour inventer des agricultures résilientes dans un monde plus durable et solidaire. Il met son expertise au service de tous, des producteurs aux politiques publiques, pour favoriser la protection de la biodiversité, les transitions agroécologiques, la durabilité des systèmes alimentaires durables, la santé (des plantes, des animaux et des écosystèmes), le développement durable des territoires ruraux et leur résilience face au changement climatique.
+
+Créé en 1984 sous le statut d'établissement public à caractère industriel et commercial, issu de la fusion d'instituts techniques et de recherche agronomique tropicale, le Cirad est placé sous la double tutelle du ministère de l'Enseignement supérieur, de la Recherche et de l'Innovation et du ministère de l'Europe et des Affaires étrangères.
+
+Présent sur tous les continents dans une cinquantaine de pays, le Cirad s'appuie sur les compétences de ses $1650$ salariés, dont $1140$ scientifiques, ainsi que sur un réseau mondial d'environ $200$ partenaires.
+
+L'IRD est un organisme pluridisciplinaire reconnu internationalement, travaillant principalement en partenariat avec les pays méditerranéens et intertropicaux [[\textcolor{red}{lien vers le site web}](https://www.ird.fr/node/8)]. Par son réseau et sa présence dans une cinquantaine de pays, l'IRD défend un modèle original de partenariat scientifique équitable avec les pays du Sud.
+Science du développement durable, innovation et interdisciplinarité constituent les piliers de sa recherche, engagée pour la réalisation des objectifs de développement durable.
+
+\section{Description du projet DiFUS-E}
+
+Le projet DiFUS-E a été initié par les chercheurs et chercheuses du CIRAD et de l'IRD de la place de Montpellier.
+En raison des dégradations environnementales d'origine anthropique, ces chercheurs, se sont interrogés sur les possibilités de changement des modes de fonctionnement de la recherche, afin de lutter contre ces dégradations. 
+Le projet s'organise autour de quatre activités principales qui sont :
+
+L'activité $1$, sujet de mon stage, vise à caractériser la diversité des pratiques et des points de vue des acteurs manifestant leur volonté de s'engager dans le changement face aux urgences socio-écologiques au sein de la RPD.
+
+L'activité $2$, concerne une analyse compréhensive de ces pratiques et points de vue, au travers d'une série d'entretiens appronfondis auprès d'un échantillon d'acteurs représentant la diversité des profils mise en évidence dans l'activité $1$. L'objectif est de mettre en évidence les points de rupture, ainsi que les leviers et obstacles au changement qu'ils identifient.
+
+L'activité $3$, vise à faire un travail d'état des lieux, permettant de situer les propositions de changement émergeant des acteurs de la RPD enquêtés dans les activités $1$ et $2$ par rapport aux initiatives portées par les différentes institutions de ce secteur, puis d'explorer différents chemins de transformation mobilisant les synergies entre ces propositions.
+
+Et finalement, l'activité $4$, a pour but de mettre en débat les résultats du projet, lors d'un évènement final, visant à imaginer l'avenir des dynamiques de réflexion pour le changement dans la RPD, à l'interface entre communautés scientifique et citoyenne.
+
+\section{Contexte Mathématique et informatique du projet}
+
+De nos jours, les données affluent dans tous les secteurs. Cependant, il est nécessaire d'analyser ces données de façon pertinente pour aider à la bonne prise de décision. Cette analyse est rendu facile et efficace grâce à l'évolution des méthodes d'analyse de données qui permettent d'extraire ou de synthétiser de l'information contenue dans un jeu de données.
+
+Sans ces méthodes, il est pénible pour un être humain de trouver une rélation ou décrire des informations dans une base de données lorsque les entrées deviennent trop complexes.
+
+On confie donc à des programmes le soin d'ajuster un modèle pour simplifier cette complexité et de l'utiliser de manière opérationnelle en se basant sur des techniques mathématiques.
+
+C'est dans cette optique, qu'il est tout à fait interessant d'effectuer des études mathématiques en utilisant des techniques informatiques sur la base de données du projet.
+
+\chapter{Chapitre II : Présentation des données}
+Les données utilisées proviennent de deux sources principales : 
+
+la première source concerne les données d'enquêtes par questionnaire, qui ont circulé de septembre à décembre 2019 auprès des personnes (travaillant dans le secteur de la recherche avec et pour les Suds) du CIRAD, CNRS, INRAE, Univ Montpellier, IRD, Montpellier Suprago et Université Montpellier 3. Ce questionnaire a été construit en lien avec l'initiative \textit{Labo 1.5}, et visait à recueillir le point de vue des individus concernant : 
+\begin{itemize}
+  \item ce qu'il faudrait faire au sein du secteur académique,
+  \item ce qu’ils font, ou seraient prêts à faire face aux urgences socio-écologiques.
+\end{itemize}
+
+La deuxième source concerne les commentaires faits par les signataires d'un manifeste en ligne, ayant circulé en juin et juillet $2020$ par la liste de diffusion à l'ensemble des UMR rattachées au CIRAD concernant les propositions sur les points de rupture ou de changements souhaitables ou à éviter, et sur la traduction en action des changements souhaités.
+
+La deuxième source de données n'a pas pu être étudiée durant le stage, il ne fera donc pas l'objet de ce rapport.
+
+\section{Description des données}
+
+La base de données d'enquête par questionnaire comporte $402$ observations et $44$ variables qualitatives dont $28$ questions fermées et $16$ questions ouvertes.
+
+Ces questions fermées peuvent se regrouper respectivement en $4$ groupes à savoir : 
+\begin{itemize}
+   \item avis sur les pratiques collectives
+  \item avis sur les pratiques individuelles
+  \item avis sur la position du CIRAD
+  \item avis socio-démographiques
+\end{itemize}
+
+Pour la suite, nous noterons les questions du groupe :
+\begin{itemize}
+  \item pratiques collectives par $Q1.$
+  \item pratiques individuelles par $Q2.$
+  \item position du CIRAD par $Q3.$
+  \item socio-démographique par $Q4.$.
+\end{itemize}
+Les significations sont précisées dans l'annexe [\ref{annexe1}].
+
+Le groupe avis sur les pratiques collectives ne contient qu'un seul thème : "\textit{la recherche et l'urgence climatique}" contenant $2$ questions fermées.
+
+Le groupe avis sur les pratiques individuelles contient aussi qu'un seul thème : "\textit{mon positionnement individuel au travail en lien avec l'urgence climatique}“ contenant $9$ questions fermées.
+
+Le groupe avis sur la position du CIRAD contient $2$ thèmes : 
+\begin{itemize}
+  \item le CIRAD et l'urgence climatique ($3$ questions fermées)
+  \item actions possibles pour réduire l'empreinte environnementale du CIRAD ($10$ questions fermées)
+\end{itemize}
+
+Puis le groupe socio-démographique contient $4$ questions fermées à savoir : 
+\begin{itemize}
+  \item tranche d'âge ($\leq29$; $30-39$; $40-49$; $50-59$; $\geq60$)
+  \item genre (féminin; masculin; autre)
+  \item statut (chercheur, doctorant, ingénieur/technicien-administratif, stagiaire/VSC)
+  \item champ principal d'activité (appui, autre, direction, recherche)
+\end{itemize}
+
+La suite du rapport sera consacrée à la partie pratique, les méthodes utilisées pour l'analyse des données des questions fermées et des questions ouvertes du questionnaire en ligne afin de répondre aux problématiques.
+\chapter{Chapitre III : Analyse des questions fermées}
+
+Dans ce chapitre, nous allons nous concentrer uniquement sur l'analyse des questions fermées de l'enquête par questionnaire comportant $402$ observations et $28$ questions fermées.
+
+\section{Méthodologies}
+
+Pour procéder à une analyse des données des questions fermées, les méthodes ci-dessous ont été utilisées : 
+
+D'une part, des méthodes d'analyse multifactorielle qui permettent de réduire la dimension d'un jeu de données en proposant une représentation du nuage de points initial dans un sous-espace de dimension plus petite, contenant le maximum d'informations.
+
+D'autre part, des méthodes de classification non supervisées qui permettent quant à elles d'identifier des sous-groupes dans les données.
+
+Plus précisément, nous utiliserons des méthodes comme l'analyse des correspondances multiples - ACM, l'analyse factorielle multiple - MFA et la classification ascendante hiérarchique - CAH afin d'identifier : 
+
+\begin{itemize}
+    \item un groupe de personnes ayant un profil similaire dans leurs réponses aux questions.
+    \item les associations entre les catégories des questions.
+    \item une éventuelle typologie 
+\end{itemize}
+
+Cependant, les valeurs manquantes ont une conséquence sur l’estimation de nos différentes méthodes et doivent être traitées avec prudence. Nous allons regarder les valeurs manquantes de notre base de données d’enquête des questions fermées. 
+
+De plus, les modalités mal représentées influencent beaucoup les résultats de nos différentes méthodes (surtout les méthodes d'analyse multifactorielles) et doivent être traitées avec prudence. C'est pourquoi, un premier travail de ré-catégorisation a été effectué afin de tenir compte de l'influence de ces modalités.
+
+Ainsi, en tenant compte de l'importance de certaines questions, toutes les modalités avec moins de $1\%$ de réprésentation ont été rédistribuées sur les autres de façon proportionnelle à leur fréquence. Donc à partir de maintenant, toutes nos modalités sont bien représentées.
+
+\subsection{Traitement des données manquantes}
+
+À noter qu’une première analyse factorielle nous a permis d’identifier un individu très extrême qui biaisait nos analyses donc nous avons décidé de l’enlever. En effet, cet individu portant le numéro $224$ correspondant à l'identifiant $11191749516$ pense que ce questionnaire est biaisé. Ces réponses ne nous apportaient pas grand-chose pour la compréhension de l'analyse. Voici quelques commentaires donnés par cet individu dans le tableau ci-dessous : 
+```{r}
+d_224<- read_excel(here::here("data/tab_224.xlsx"), col_names = TRUE, skip = 1) %>% 
+  as.data.frame()
+```
+
+
+```{r tab0, include=TRUE, fig.align='center'}
+d_224 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = " Commentaires associés à l'individu extrême ")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+Regardons sur la figure ci-dessous, le graphe du nombre des valeurs manquantes en fonction de chaque variable ou questions fermées.
+
+```{r , include=TRUE, fig.height= 4, fig.cap=  "Graphe : valeurs manquantes des variables", fig.align='center', fig.pos="H"}
+gg_miss_var(enquete4.new)
+```
+
+Sur la figure $3.1$, la majeure partie des variables ont au plus $50$ valeurs manquantes sauf deux variables qui en ont exactement $50$. 
+
+En regardant, les valeurs manquantes en fonction de chaque individus ou enquêtés, sur $401$ individus, $73$ individus ont au moins une valeur manquante dans leurs réponses aux questions. Parmi ces $73$ individus, nous remarquons que $34$ individus répondent uniquement à des questions provenant du groupe de questions les _avis sur les pratiques collectives_. Nous retirons ces individus pour la suite de notre analyse. Nous avons maintenant $39$ individus qui ont au moins une valeur manquante.
+
+De plus, nous faisons l'hypothèse de garder pour la suite de l'analyse, les individus qui ont répondu au moins à une question de chaque groupe. Nous observons que parmi les $39$ individus restants, $3$ individus seulement ne répondent pas à ce critère. Il nous reste maintenant $36$ individus qui ont répondu à au moins une question de chaque groupe.
+
+Pour conclure, parmi les $401$ observations, $37$ individus ont été enlevés de l'enquêtes. Notre base de données contient $364$ observations et $28$ variables.
+
+Parmi ces $364$ enquêtés, nous avons fait le choix de garder $36$ individus ayant des valeurs manquantes mais qui ont répondu à au moins une question de chaque groupe.
+
+Ce choix est fait dans le but d'améliorer les méthodes d'imputation que nous allons appliquer sur notre base de données afin de ne pas perdre des informations importantes.
+
+Le principe de cette imputation est le suivant : pour un individu i0 n’ayant pas répondu à une question q0, l’algorithme parcourt tous les autres individus et choisit l’individu qui a tendance à répondre de façon similaire qu’i0 en donnant la réponse à cette question q0 de cet individu à l’individu i0.
+
+Nous décidons de présenter pour la suite de cette partie les résultats de nos méthodes en utilisant la base de données imputées.
+
+Nous allons maintenant regarder quelques variables en donnant des statistiques descriptives afin de mieux cerner la base de données. Les statistiques descriptives de chaque question en considérant la base de données non imputées (364 observations et 28 variables) se trouvent à l'annexe [\ref{annexe2}].
+
+```{r}
+# On enlève surtout l'individu extrême mais aussi tous les individus qui ont au moins
+# 19 valeurs manquantes sur 28 variables avant d'effectuer l'imputation
+
+enquete4.new.impute<- enquete4.new[-c(223,17,26,31,33,37,38,47,54,
+                                           58,97,108,118,125,126,133,157,160,193
+                                           ,201,203,204,209,228,234,244,245,265,
+                                           267,290,330,333,337,352,354,378,379,381),]
+
+tab.comp = imputeMCA(enquete4.new.impute)
+res.mca<- MCA(tab.comp$completeObs, graph = FALSE,quali.sup = 25:28)
+```
+
+\section{Statistiques descriptives}
+
+Nous allons présenter la répartition des catégories des variables socio-démographiques de notre base de données imputée.
+
+```{r, include=TRUE, echo=FALSE, fig.height=2, fig.cap="Répartition du genre", fig.align='center', fig.pos="H"}
+ggplot(tab.comp$completeObs) +
+  aes(x = tab.comp$completeObs$Q4.2.genre) +
+  geom_point(stat = "count") +
+  xlab("Modalités") +
+  ylab("Effectifs")
+
+```
+
+
+```{r, include=TRUE, echo=FALSE, fig.height=2, fig.cap="Répartition de l'âge", fig.align='center', fig.pos="H"}
+ggplot(tab.comp$completeObs) +
+  aes(x = tab.comp$completeObs$Q4.1.âge) +
+  geom_point(stat = "count") +
+  xlab("Modalités") +
+  ylab("Effectifs")
+
+```
+
+```{r, include=TRUE, echo=FALSE, fig.height=2, fig.cap="Répartition du statut", fig.align='center', fig.pos="H"}
+ggplot(tab.comp$completeObs) +
+  aes(x = tab.comp$completeObs$Q4.3.statut) +
+  geom_point(stat = "count") +
+  xlab("Modalités") +
+  ylab("Effectifs")
+
+```
+
+```{r, include=TRUE, echo=FALSE, fig.height=2, fig.cap="Répartition du champ principal d'activité", fig.align='center', fig.pos="H"}
+ggplot(tab.comp$completeObs) +
+  aes(x = tab.comp$completeObs$Q4.5.activite) +
+  geom_point(stat = "count") +
+  xlab("Modalités") +
+  ylab("Effectifs")
+
+```
+
+Nous observons qu'il n'y a pas une différence significative concernant le profil d'âge de nos enquêtés, par contre le statut \textit{chercheur}, le champ d'activité \textit{recherche} et les genres \textit{masculin} - \textit{féminin} sont les plus représentés.
+
+\section{Analyse des correspondances multiples - ACM}
+
+```{r, include=TRUE, echo=FALSE, fig.cap="Data", fig.height=4, out.width = '100%', fig.align='center', fig.pos="H"}
+knitr::include_graphics("ACM.png")
+```
+L'analyse des correspondances multiples (ACM) est une méthode qui permet d'étudier l'association entre au moins deux variables qualitatives.
+
+On cherche à décrire un nuage de points de n individus décrits par p variables qualitatives. Pour cela, à partir de ce tableau brut ( Individus x Variables ), on construit un tableau dit tableau disjonctif complet (TDC) qui joue un rôle clé en ACM car c'est ce tableau qui est analysé par les logiciels dont les lignes sont les individus et les colonnes sont cette fois les modalités des variables qualitatives. Ainsi si la colonne $j$ du tableau initial a $K_j$ modalités il y aura $K_j$ colonnes dans le TDC, chacune correspondant à une modalité de la variable j. À l'intersection de la ligne $i$ et de la colonne $k$ on trouve $y_{ik}$ qui vaut $1$ si l'individu $i$ possède la modalité $k$ de la variable $j$ et $0$ sinon. Prenons un petit exemple (voir tableau ci-dessus). La variable $genre$ à $K_j=3$ modalités et l'individu $i^{'}$ présente la modalité $féminin$ (qui est la 2ème modalité). Dans le tableau disjonctif complet, au niveau de la ligne $i^{'}$ et de la variable $j$ on va trouver un $1$ en deuxième position puisque c'est la deuxième modalité qui est possédée par l'individu $i^{'}$, et des $0$ partout ailleurs. Donc c'est un tableau indicatrice qui ne contient que des $0$ et $1$.
+
+À noter que cet tableau est au préalable transformé en le divisant par la proportion d'individus possédant la modalité considérée ce qui revient à centrer le TDC. En effet en ACM tous les individus ont le même poids, il n'y a aucune raison d'accorder plus d'importance aux réponses d'un enquêté plutôt qu'à celles d'un autre; et comme la somme des poids doit être égale à $1$, le poids de chaque individus est égal à $\frac{1}{I}$.
+
+On va commencer par l'étude des individus en s'intéressant à la variabilité des individus tout en l'explorant d'un point de vue multidimensionnel et mettre en évidence les principales dimensions.
+Puis l'étude des variables en s'intéressant aux associations entre modalités puisque deux variables qualitatives sont liées si les modalités de l'une s'associent de façon particulière aux modalités de l'autre.
+
+Ainsi, la proximité des individus pourra s'interpréter de la manière suivante :
+\begin{itemize}
+    \item si deux individus prennent les mêmes modalités et ont exactement le même profil, la distance qui les sépare est nulle
+    \item si deux individus ont en commun beaucoup de modalités, la distance qui les sépare sera pétite
+    \item si deux individus ont en commun beaucoup de modalités sauf une, rare qui est prise par l'un des deux, alors la distance qui les sépare sera relativement grande
+    \item si deux individus ont en commun une modalité rare, la distance qui les sépare sera relativement petite.
+\end{itemize}
+
+\subsection{Interprétation - Visualisation : Pourcentage de variance}
+
+On observe sur la figure $3.7$, le graphique de pourcentage d'inertie en fonction des axes ou dimensions. Le pourcentage d'inertie associé au premier plan est de $14.5 \%$ ce qui est relativement faible. À partir de la dimension $3$, les pourcentages d'inerties sont relativement comparables et faibles donc on n’utilisera pas le critère du pourcentage d’inertie pour choisir le nombre d’axes à retenir.
+
+La seule solution qui s'offre à nous pour le choix du nombre d'axes ou dimensions est la règle du coude mais aussi en cherchant plus les axes qui sont intéressants à interpréter. En observant la figure, la règle du coude nous préconise de garder entre $2$ et $4$ dimensions qui caractériseront l'inertie totale (la variabilité des individus).
+
+```{r, include=TRUE, fig.height=3.6, fig.cap="Graphe : pourcentage de variance", fig.align='center', fig.pos="H"}
+fviz_screeplot (res.mca, addlabels = TRUE, ylim = c (0, 10))
+```
+
+Nous allons maintenant regarder en fonction de ces axes la variabilité du nuage de points des individus.
+
+\subsection{Interprétation - Visualisation des résultats : Biplot Individus - modalités Variables}
+
+- Plan 1-2
+
+```{r, include=TRUE, fig.width=8.5, fig.cap="Plan 1-2 : Nuage de points des individus et des catégories de variables", fig.align='center', fig.pos="H"}
+fviz_mca_biplot (res.mca, select.ind = list (contrib = 402), axes = c(1,2),
+                 select.var = list (contrib = 20), geom.ind =  "point", col.ind="cos2",
+                 ggtheme = theme_minimal ())
+
+```
+
+
+Nous observons sur la figure $3.8$ le nuage de points des individus et des catégories de variables sur les deux premières dimensions ou axes qui représentent $14.5 \%$ de l'inertie totale. En regardant l'allure du nuage de points, nous remarquons qu'il s'élargit autour de deux bissectrices.
+
+Une première bissectrice comportant beaucoup plus d'individus qui sont repartis de façon homogène autour de l'origine puis s'élargissent de part et d'autre le long de la bissectrice. 
+Une deuxième bissectrice qui va du centre vers le coin supérieur droit possédant moins de points et dont certains sont plus excentrés.
+
+La deuxième bissectrice concerne les individus qui ont tendance à donner des réponses très négatives aux questions concernant les avis sur la position du CIRAD et les avis sur les pratiques collectives. En effet, la majeure partie de ces questions concernent les actions à entreprendre du point de vue collectif pour réduire l'empreinte environnementale mais aussi les mesures et les actions que le CIRAD doit adopter en réponse à l'urgence climatique. 
+
+Par contre, la première bissectrice oppose les individus qui ont tendance à être dans l'acceptation mais aussi moyennement d'accord avec les questions du groupe avis sur les pratiques collectives et du groupe avis sur la position du CIRAD.
+
+En regardant les catégories des variables les plus contributives à ce plan $1-2$, nous remarquons que la variable $Q2.6$ du groupe pratiques individuelles désignant : \textit{ Je suis prêt.e à rentrer dans une action collective pour faire changer les choses au CIRAD} y contribue. Ce qui est tout à fait normal car nous voyons qu'elle concerne aussi une action à entreprendre vis-à-vis du CIRAD.
+
+- Plan 2-3
+
+```{r, include=TRUE, fig.width=8.5, fig.cap="Plan 2-3 : Nuage de points des individus et des catégories de variables", fig.align='center', fig.pos="H"}
+fviz_mca_biplot (res.mca, select.ind = list (contrib = 402), axes = c(2,3),
+                 select.var = list (contrib = 20), geom.ind =  "point", col.ind="cos2",
+                 ggtheme = theme_minimal ())
+
+```
+
+Connaissant ce qui caractérise la dimension $2$, nous allons nous focaliser sur la dimension $3$. On observe sur la figure $3.9$ que la dimension 3 est décrite uniquement du côté de son pôle positif. 
+
+On voit également de façon claire que cette dimension caractérise plus les individus qui ont tendance à ne pas se prononcer sur les questions concernant les avis sur les pratiques collectives et les avis sur la position du CIRAD.
+
+De même, en regardant les catégories des variables les plus contributives à l'axe $3$, nous remarquons aussi trois questions du groupe avis sur les pratiques individuelles qui contribuent à cet axe à savoir la variable $Q2.4$ désignant : \textit{Parmi les voyages internationaux professionnels que j'ai effectués ces 5 dernières années, combien étaient indispensables à l’exercice de mon métier ?}; la variable $Q2.1$ désignant : \textit{J'ai fait évoluer mes sujets de recherche en réponse aux alertes sur le changement climatique} et toujours la variable $Q2.6$.
+
+- Axe $4$
+
+En regardant cette fois-ci la contribution des catégories de nos variables à l'axe $4$, nous observons sur la figure $3.10$ que les variables qui contribuent le plus à cet axe sont celles du groupe avis sur les pratiques individuelles et du groupe avis sur la position du CIRAD.
+
+Donc on conclut que l'axe $4$ caractérise plus les individus qui répondent à des questions du groupe avis sur les pratiques individuelles et du groupe avis sur la position du CIRAD. Cependant les réponses apportées par les individus à cet axe restent mitigées.
+
+
+```{r, include=TRUE, fig.height=3.5, fig.cap="Graphe : Contribution des catégories sur l'axe 4", fig.align='center', fig.pos="H"}
+fviz_contrib(res.mca, choice = "var", axes = 4, top = 50)
+```
+
+
+En résumé, cette méthode d'analyse factorielle (ACM) nous a permis par l'interprétation des dimensions ou axes de déterminer un groupe de personnes ayant un profil similaire dans leurs réponses aux questions ainsi que les associations entre les catégories de variables. 
+On conclut que nos trois premières dimensions sont fortement liées avec les questions du groupe avis sur les pratiques collectives et du groupe avis sur la position du CIRAD. Seule la dimension $4$ est liée avec toutes les questions du groupe avis sur les pratiques individuelles.
+
+Notamment, la dimension $1$ caractérise à la fois les individus qui sont en désaccord et dans l'acceptation des mesures et des actions; la dimension $2$ caractérise les individus qui sont partiellement d'accord mais aussi en désaccord et la dimension $3$ caractérise les individus qui ne se prononcent pas. Ainsi pour déterminer le profil d'un individu sur ces $3$ dimensions, les questions du groupe avis sur les pratiques collectives et position du CIRAD sont les plus influentes. 
+
+Quant à la dimension $4$, il n'y a pas une distinction significative des différents profils.
+
+\section{Analyse factorielle multiple - MFA}
+
+L’Analyse Factorielle Multiple (MFA) est une méthode d’analyse de données multivariées permettant de résumer et de visualiser un tableau de données complexe, dans lequel les individus sont décrits par plusieurs ensembles de variables structurées en groupes.
+
+Elle permet de prendre en compte la contribution de tous les groupes actifs de variables pour définir la distance entre les individus. Ainsi, nous pourrons voir exactement les dépendances entre les groupes de variables et les dimensions.
+
+Cependant, il n'y a pas de différence dans l'interprétation des résultats de l'ACM et ceux de MFA car on effectue l'ACM sur l'ensemble de nos variables mais structurées en groupes. Une des choses importantes dans MFA est qu'on aura des résultats de l'ACM propres à chaque groupe.
+
+De ce fait, nous allons uniquement présenter la dépendance de nos différents axes avec nos groupes de questions afin de confirmer les caractérisations des axes décrites dans la partie ACM.
+
+Nous allons regrouper nos variables en $4$ groupes de questions à savoir : 
+
+\begin{itemize}
+    \item un premier groupe de variables catégorielles spécifiant les questions concernant les avis sur les pratiques collectives correspondant aux deux premières colonnes du tableau de données
+    \item un deuxième groupe de variables catégorielles spécifiant les questions concernant les avis sur les pratiques individuelles correspondant aux $9$ colonnes suivantes après le premier groupe
+    \item un troisième groupe de variables catégorielles spécifiant les questions concernant les avis sur la position du CIRAD correspondant aux $13$ colonnes suivantes après le deuxième groupe
+    \item puis un quatrième groupe de variables catégorielles spécifiant les questions socio-démographiques correspondant aux $4$ colonnes suivantes après le troisième groupe.
+\end{itemize}
+
+Nous considérons le quatrième groupe comme supplémentaire afin d'apporter une aide à l'interprétation.
+
+```{r data_MFA}
+enquete4.MFA<- enquete3.new[,-c(1,2,3)]
+
+# avec imputation des données manquantes
+enquete4_sans_224_NA.MFA<- 
+enquete4.MFA[-c(223,17,26,31,33,37,38,47,54,
+                                           58,97,108,118,125,126,133,157,160,193
+                                           ,201,203,204,209,228,234,244,245,265,
+                                           267,290,330,333,337,352,354,378,379,381),]
+
+tab.comp.NA.MFA = imputeMCA(enquete4_sans_224_NA.MFA)
+
+res.NA.MFA<- MFA(tab.comp.NA.MFA$completeObs, group = c(2,9,13,4),
+                 name.group = c("Pratiques collectives","Pratiques individuelles",
+                                "Position CIRAD","socio-démographique"),
+                 type=c("n","n","n","n"),num.group.sup = 4,graph=FALSE)
+```
+
+\subsection{Interprétations - Visualisations des résultats}
+
+- Corrélation entre les groupes de variables et le plan 1-2
+
+```{r, include=TRUE, fig.height=3.8, fig.cap="Graphe de corrélation entre les groupes de variables et le plan 1-2", fig.align='center', fig.pos="H"}
+# corrélation entre les groupes et le plan (1,2)
+fviz_mfa_var(res.NA.MFA, "group",axes = c(1,2))
+
+```
+
+Nous observons sur la figure $3.11$, la corrélation (dépendance) entre les différents groupes de notre modèle et le plan (1,2). Le groupe coloré en vert désigne le groupe socio-démographique; pour déterminer la position d'un individu dans ce plan, les questions de ce groupe ne sont pas influentes.
+
+Nous observons que la première dimension est fortement liée avec les deux groupes à savoir les avis sur les pratiques collectives, et la position du CIRAD avec un coefficient largement supérieur à $0.70$ pour les deux groupes. Cela veut dire que pour déterminer la position d'un individu sur la dimension $1$, les questions de ces deux groupes sont les plus influentes.
+On note aussi que le groupe avis sur les pratiques individuelles est moyennement corrélé avec la dimension $1$ avec un coéfficient de l'ordre de $0.47$. 
+Comme on avait précisé dans la partie $ACM$, on peut dire alors pour déterminer la position d'un individu sur la dimension $1$, quelques questions du groupe avis sur les pratiques individuelles sont les plus influentes notamment les questions $Q2.6$ et $Q2.7$.
+
+Par contre, seul le groupe avis sur les pratiques collectives contribue très fortement à la dimension $2$. Donc pour déterminer la position d'un individu sur cette dimension, les questions de ce groupe sont les plus influentes.
+
+- Corrélation entre les groupes de variables et plan 3-4
+
+Pour le plan (3,4) nous remarquons que le groupe concernant les avis sur les pratiques individuelles est fortement lié à la dimension $4$. Donc pour déterminer la position d'un individu sur cette dimension, les questions de ce groupe sont les plus influentes.
+
+Cependant, nous observons qu'uniquement le groupe avis sur les pratiques collectives est fortement lié avec la dimension $3$; de même pour déterminer la position d'un individu sur cette dimension, les questions de ce groupe sont les plus influentes.
+
+```{r, include=TRUE, fig.height=3.8, fig.cap="Graphe de corrélation entre les groupes de variables et le plan 3-4", fig.align='center', fig.pos="H"}
+# corrélation entre les groupes et le plan (3,4)
+fviz_mfa_var(res.NA.MFA, "group",axes = c(3,4))
+
+```
+
+Nous allons appuyer l'interprétation de ces axes en se focalisant sur les questions du groupe socio-démographique et aussi les questions liées à la mobilité afin de faire le lien avec l'activité $2$.
+
+\section{Aide à l'interprétation}
+\subsection{Questions socio-démographiques}
+
+Sur la figure $3.13$, l'âge n'a pas d'influence sur le fait d'être dans l'acceptation, en désaccord, partiellement d'accord ou neutre des mesures et des actions en réponse à l'urgence climatique (pas un groupe de points de même couleur qui se détache parfaitement; les points sont mélangés).
+
+```{r, include=TRUE, fig.height=3.6, fig.width=8.5, fig.cap="Nuage de points des individus en fonction de l'âge - MFA", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q4.1.âge", # color by groups 
+             label="none", axes = c(1,2),
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE
+) 
+```
+
+Sur la figure $3.14$, nous observons que sur la première bissectrice, le statut n'a pas d'influence sur le fait d'être dans l'acceptation ou partiellement d'accord avec les mesures et les actions en réponse à l'urgence climatique. Cependant en regardant la deuxième bissectrice (en haut à droite), le statut \textit{chercheur.es} est le plus influent (la majeure partie des points prend la couleur rouge), puis un seul individu a pour statut \textit{doctorant.e}.
+
+```{r, include=TRUE, fig.height=3.8, fig.width=8.5, fig.cap="Nuage de points des individus en fonction du statut - MFA", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q4.3.statut", # color by groups 
+             label="none", axes = c(1,2),
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE
+) 
+```
+
+Sur la figure $3.15$, le champ d'activité n'a pas d'influence sur la première bissectrice (pas un groupe de points de même couleur qui se détache). Par contre, sur la deuxième bissectrice, la $recherche$ est la plus représentée (la majeure partie des points prend la couleur violette).
+
+```{r,include=TRUE, fig.height=4, fig.width=8.5, fig.height=4, fig.cap="Nuage de points des individus en fonction du champ d'activité - MFA", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q4.5.activite", # color by groups 
+             label="none", axes = c(1,2),
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE
+) 
+```
+
+Sur la figure $3.16$, le genre n'a pas d'influence sur la première bissectrice (pas un groupe de points de même couleur qui se détache). Par contre, sur la deuxième bissectrice, les genres \textit{masculin} et \textit{autre} sont les plus représentés (la majeure partie des points prend les couleurs rouge et bleue).
+
+```{r,include=TRUE, fig.height=4, fig.width=8.5, fig.height=4, fig.cap="Nuage de points des individus en fonction du genre - MFA", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q4.2.genre", # color by groups 
+             label="none", axes = c(1,2),
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE
+) 
+```
+
+En résumé, les questions socio-démographiques n'ont pas d'influences sur la première bissectrice; par contre sur la deuxième bissectrice (allant du centre vers le coin supérieur droit du graphe), la majeure partie de ces individus sont des \textit{chercheur.es}, ayant pour champ d'activité la \textit{recherche} - \textit{l'appui} et ont pour genres \textit{masculin} - \textit{autre}.
+
+\subsection{Questions liées à la mobilité}
+
+Dans cette partie, nous faisons un focus sur les questions liées à la mobilité afin de faire le lien avec l'activité $2$.
+
+Nous considérons toujours la base de données imputées composée de $364$ observations et $28$ questions.
+
+Nous allons représenter la variabilité de nos individus en fonction de chaque variable liée à la mobilité sur nos différents axes obtenus grace à l'analyse factorielle multiple (MFA).
+
+- $Q1.2$ : \textbf{L’organisation, l’évaluation et le financement de la recherche (nationale, européenne, internationale) poussent à des déplacements trop nombreux et inutiles}
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q1.2", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q1.2.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+À noter que la question $Q1.2$ fait partie du groupe avis sur les pratiques collectives; or nous avons vu que pour déterminer la position d'un individu dans le plan $1-2$, les questions du groupe avis sur les pratiques collectives font parties des questions les plus influentes. D'où le choix d'interpréter le nuage de points des individus sur ce plan.
+
+Sur la première bissectrice, nous observons que la majeure partie des enquêtés sont d'accord (la majeure partie des points prend les couleurs violette et rouge) sur le fait que l'organisation, l'évaluation et le financement de la recherche poussent à des déplacements trop nombreux et inutiles. 
+
+Sur la deuxième bissectrice (partant du centre vers le coin supérieur droit du graphe); les individus qui ont tendance à être en désaccord surtout avec les questions liées aux avis sur les pratiques collectives restent globalement du même avis pour cette question (points colorés en bleu).
+
+En résumé, la majeure partie des individus ayant répondu à l'enquête sont tout à fait d'accord avec la question $Q1.2$ sauf les individus qui ont tendance à être en désaccord surtout avec les questions liées aux avis sur les pratiques collectives et la position du CIRAD. Ces individus ne sont pas d'accord du fait que l'organisation, le financement et l'évaluation de la recherche ont un effet défavorable sur la mobilité.
+
+- $Q2.4$ : \textbf{Parmi les voyages internationaux professionnels que j'ai effectués ces 5 dernières années, combien étaient indispensables à l’exercice de mon métier ?}
+
+La question $Q2.4$ fait partie du groupe avis sur les pratiques individuelles; or nous avons vu que les questions de ce groupe sont les plus influentes pour determiner la position d'un individu sur l'axe $4$. D'où le choix d'interpréter le nuage de points des individus sur le plan $3-4$.
+
+Sur la figure $3.18$, nous observons sur l'axe $4$ que la question $Q2.4$ n'a pas une différence significative (il n'y a pas un groupe de points de même couleurs qui se détachent).
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q2.4", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q2.4.new", # color by groups 
+              axes = c(3,4), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Regardons maintenant sur le plan $1-2$ qui caractérise surtout les questions du groupe avis sur les pratiques collectives et avis sur la positon du CIRAD.
+
+Sur la figure $3.19$, nous voyons que les réponses données sur la première bissectrice  pour cette question du groupe avis sur les pratiques individuelles sont mitigées (il n'y a pas un groupe de points de même couleurs qui se détachent).
+Par contre sur la deuxième bissectrice (en haut à droite), de façon globale les individus qui ont tendance à être en désaccord avec les questions liées aux pratiques collectives et à la position du CIRAD disent qu'au moins $80\%$ des voyages internationaux professionnels qu'ils ont effectués sont indispensables à l'exercice de leurs métiers. 
+Parmi ces individus, nous observons deux individus $306$ et $276$ (colorés en rouge) auquel respectivement l'un contribue le plus au plan $1-2$ et l'autre contribue le plus à l'axe $2$, qui pensent qu'à peu près moins de $20\%$ ou $60\%$ des voyages internationaux professionnels qu'ils ont effectués sont indispensables à l'exercice de leurs métiers.
+
+```{r, include=TRUE, fig.height=3.9, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q1.2 : plan 1-2", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q2.4.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+ 
+- $Q2.8$ : \textbf{Je considère ou j’ai déjà considéré changer de métier ou de thèmes de recherche pour réduire ma mobilité}
+
+De même, la question $Q2.8$ fait partie du groupe avis sur les pratiques individuelles; d'où le choix d'interpréter le nuage de points des individus sur le plan $3-4$.
+
+Sur la figure $3.20$, les réponses données pour cette question sont mitigées sur l'axe $4$ (il n'y a pas un groupe de points de même couleurs qui se détachent).
+
+```{r, include=TRUE, fig.height=3.8, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q2.8", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q2.8.new", # color by groups 
+              axes = c(3,4), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Regardons sur le plan $1-2$ qui caractérise surtout les questions du groupe pratiques collectives et positon du CIRAD.
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q2.8 : plan 1-2", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q2.8.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Sur la figure $3.21$, nous observons sur la première bissectrice que les réponses données pour cette question sont mitigées (il n'y a pas un groupe de points de même couleurs qui se détachent). 
+Par contre, sur la deuxième bissectrice (en haut à droite) nous voyons que la majeure partie des individus (points colorés en rouge) pensent que changer de métier ou de thèmes de recherche n'a pas d'effet sur le fait de réduire la mobilité.
+
+Cependant, un individu portant le numéro $182$ qui contribue fortement à ce côté droit de la deuxième bissectrice (point coloré en bleu) considère avoir changé de métier ou de thèmes de recherche pour réduire sa mobilité.
+
+Donc cet individu qui a l'habitude d'être en désaccord avec les mesures et les actions en lien surtout avec les questions du groupe pratiques collectives et position du CIRAD pense que changer de métier ou de thèmes de recherche permet de réduire la mobilité en réponse à l'urgence climatique.
+
+- $Q2.9$ : \textbf{J’ai fait évoluer (ou j'ai toujours favorisé) mes pratiques de mobilité vers des moyens doux pour me rendre à mon lieu de travail}
+
+De même, la question $Q2.9$ fait partie du groupe avis sur les pratiques individuelles; d'où le choix d'interpréter le nuage de points des individus sur le plan $3-4$. 
+
+Sur la figure $3.22$, nous observons sur l'axe $4$ que les réponses données pour cette question sont mitigées (il n'y a pas un groupe de points de même couleurs qui se détachent).
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q2.9", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q2.9.new", # color by groups 
+              axes = c(3,4), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Regardons sur le plan $1-2$.
+
+```{r, include=TRUE, fig.height=3.6, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q2.9 : plan 1-2", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q2.9.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+
+Nous observons que cette question du groupe avis sur les pratiques individuelles n'a pas d'effet sur la première bissectrice (il n'y a pas un groupe de points de même couleurs qui se détachent). Par contre sur la deuxième bissectrice, nous voyons que cette fois-ci la majeure partie des individus qui contribue le plus pensent qu'évoluer ou favoriser ces pratiques de mobilité vers des moyens doux pour se rendre à leurs lieux de travail permet de réduire l'effet qu'a la mobilité en réponse à l'urgence climatique (la majeure partie des points prend les couleurs bleue et verte).
+
+Cependant, deux individus portant le numéro $128$ et $343$ (points colorés en rouge) qui contribuent fortement sur la deuxième bissectrice considèrent ne pas le faire.
+
+À partir de maintenant, nous analyserons les questions liées à la mobilité du groupe avis sur la position du CIRAD. Ces questions font référence aux actions possibles afin de réduire l'empreinte environnementale du CIRAD.
+
+Nous faisons le choix d'interpréter le nuage de points des individus sur le plan $1-2$ car nous avons vu que pour déterminer la position d'un individu sur ce plan, les questions du groupe avis sur la position du CIRAD sont les plus influentes.
+
+- $Q3.4$ : \textbf{Développement des moyens de téléconférence pour devenir une alternative efficace au voyage}
+
+```{r, include=TRUE, fig.height=3.6, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.4", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.4.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Sur la figure $3.24$, nous remarquons sur la première bissectrice que les individus qui ont tendance à être dans l'acceptation et moyennement d'accord avec les questions pratiques collectives et position du CIRAD sont favorables (points colorés en bleu et vert) pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD. 
+
+En regardant la deuxième bissectrice (en haut à droite), nous remarquons une divergence d'opinions (il n'y a pas un groupe de points de même couleurs qui se détachent). En effet, ces individus ont tendance à être en désaccord des actions et des mesures en liens surtout avec les questions pratiques collectives et position du CIRAD. Nous remarquons qu'uniquement $4$ individus portant l'identifiant $128$, $138$, $343$ et $200$ (points colorés en rouge) ne sont pas d'accord pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD.
+
+- $Q3.5$ : \textbf{Remplacement de l’avion par le train pour tous les déplacements en France métropolitaine, et pour la plupart des déplacements dans les pays européens voisins}
+
+```{r, include=TRUE, fig.height=3.8, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.5", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.5.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Sur la figure $3.25$, on observe sur la première bissectrice que la majeure partie des individus qui ont tendance à être dans l'acceptation et moyennement d'accord avec les mesures et les actions en réponse à l'urgence climatique sont favorables pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD (la majeure partie des points prend les couleurs bleue et verte).
+
+Cependant, sur cette première bissectrice, nous observons en bas à droite $3$ individus portant le numéro $264$, $57$ et $345$ (points colorés en rouge) qui contribuent le plus au pôle négatif de la dimension $2$ à être défavorable pour la mise en place de cette action.
+
+Sur la deuxième bissectrice (en haut à droite), nous remarquons toujours une divergence d'opinions (il n'y a pas un groupe de points de même couleurs qui se détachent). En effet, nous voyons que $4$ individus (points colorés en rouge) ne sont pas d'accord pour la mise en place de cette action avec toujours l'individu $128$ puis $138$, $99$ et $306$.
+
+- $Q3.6$ : \textbf{Les vols sans escales privilégiés pour les vols internationaux}
+
+Sur la figure $3.26$, la majeure partie des individus sur la première bissectrice sont d'accord à l'unanimité pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD (peu de points colorés en rouge). 
+
+Sur la deuxième bissectrice, les individus qui ont tendance à être en désaccord avec les mesures et les actions en lien avec les questions pratiques collectives et position du CIRAD sont aussi favorables à l'exception de quelques individus qui pensent que cela ne changera en rien de privilégier les vols sans escales pour les vols internationaux afin de réduire l'empreinte environnementale du CIRAD.
+
+```{r, include=TRUE, fig.height=3.8, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.6", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.6.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+
+
+- $Q3.7$ : \textbf{Les vols longue distance réservés pour des missions d’au moins 4-5 jours sur place}
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.7", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.7.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Dans l'ensemble, les individus sont favorables pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD (peu de points colorés en rouge). De plus, même les individus qui ont tendance à être en désaccord avec les mesures et les actions en réponse à l'urgence climatique sont pour la mise en place de cette action sauf un individu portant le numéro $289$ (point coloré en vert) qui ne se prononce pas là-dessus.
+
+Cependant, nous remarquons quelques individus plus centrés sur ce plan $1-2$ qui ont tendance à être en désaccord avec la mise en place de cette action notamment les individus portant l'identifiant : $46$, $329$, $43$, $190$, $193$ et $71$ (points colorés en rouge).
+
+- $Q3.8$ : \textbf{Compensation des émissions de gaz à effet de serre pour les déplacements en avion}
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.8", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.8.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Nous remarquons que pour cette action des divergences s'opèrent de façon globale. En effet en regardant sur la première bissectrice, nous voyons quelques individus qui avaient tendance à être en acceptation avec les mesures et les actions en réponse à l'urgence climatique à être cependant défavorable pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD (apparition de quelques points colorés en rouge).
+
+Sur la deuxième bissectrice (allant du centre vers le coin supérieur droit), quant aux individus qui ont tendance à être en désaccord avec les actions et les mesures en réponse à l'urgence climatique, nous voyons toujours une divergence d'opinions pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD (il n'y a pas un groupe de points de même couleurs qui se détachent).
+
+- $Q3.9$ : \textbf{Prise en compte de l’impact environnemental des déplacements dans la gestion de la mobilité géographique (expatriation versus mission).}
+
+Sur la première bissectrice, les réponses données sont mitigées (apparition de quelques points colorés en rouge).
+
+Sur la deuxième bissectrice, nous voyons toujours des divergences d'opinions pour les individus qui ont tendance à être en désaccord. Plus précisément, pour ces individus les plus contributifs nous remarquons que $3$ parmi eux ne se prononcent pas (points colorés en verts), $4$ sont défavorables (points colorés en rouge) et $4$ sont favorables (points colorés en violet et bleu) pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD.
+
+```{r, include=TRUE, fig.height=3.7, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.9", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.9.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+- $Q3.10$ : \textbf{Changements dans les critères d’évaluations de carrière (Ex : moins de poids au nombre de conférences et de séminaires invités, nombre de réunions à haut niveau ; plus de poids aux efforts de réduction des impacts environnementaux de nos activités)}
+
+```{r, include=TRUE, fig.height=3.6, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.10", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.10.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Nous observons sur la première bissectrice, une divergence d'opinions (apparition de quelques points colorés en rouge) pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD.
+
+Sur la deuxième bissectrice (en haut à droite du graphe), les individus qui ont tendance à être en désaccord avec les mesures et les actions en réponse à l'urgence climatique sont unanimement défavorables pour la mise en place de cette action (plus de points colorés en rouge et vert) dont $3$ d'entre eux ne se prononcent pas.
+
+- $Q3.11$ : \textbf{Mise en place d'un système de télé-travail}
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.11", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.11.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD, nous observons sur la première bissectrice qu'en majeure partie les individus sont favorables (peu de points colorés en rouge).
+
+Sur la deuxième bissectrice, nous voyons toujours une divergence d'opinions (il n'y a pas de groupe de points de même couleurs qui se détachent).
+
+- $Q3.12$ : \textbf{Mise en place par le Cirad de mesures incitatives pour utiliser des modes de déplacement domicile- travail sobres en carbone}
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.12", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.12.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Sur la première bissectrice, pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD, les individus qui ont tendance à être dans l'acceptation ou moyennement d'accord avec les mesures et les actions en réponse à l'urgence climatique sont tout à fait favorable (les points sont colorés en bleu et violet).
+
+Sur la deuxième bissectrice, les individus qui ont tendance à être en désaccord avec les mesures et les actions en réponse à l'urgence climatique sont aussi favorables pour la mise en place de cette action. Cependant, nous remarquons sur cette bissectrice trois individus dont l'un ($125$) (point coloré en rouge) est défavorable pour la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD, et les deux autres ($343$,$128$) (points colorés en vert) ne se prononcent pas.
+
+- $Q3.13$ : \textbf{Amélioration de l’impact environnemental de la restauration collective (plus de plats végétariens, augmentation du bio et du local, valorisation des biodéchets, etc)}
+
+```{r, include=TRUE, fig.height=4, fig.width=9, fig.cap="Nuage de points des individus en fonction de la variable Q3.13", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res.NA.MFA, 
+             habillage = "Q3.13.new", # color by groups 
+              axes = c(1,2), label="none",
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var",
+             repel = TRUE 
+) 
+```
+
+Pour la dernière action qui concerne la restauration collective notamment en intégrant plus de plats végétariens, augmentation du bio et du local, valorisation des biodéchets; nous remarquons sur la deuxième bissectrice, la majeure partie des individus qui ont tendance à être en désaccord avec les mesures et les actions en réponse à l'urgence climatique ne se positionnent pas.
+
+De façon globale, la mise en place de cette action est fortement conseillée afin de réduire l'empreinte environnementale du CIRAD.
+
+\subsubsection{Conclusion}
+
+En conclusion, pour la majeure partie des questions du groupe pratiques individuelles liées à la mobilité, les réponses apportées par les individus sont mitigées; différents profils se détachent quant aux réponses apportées par les individus qui ont tendance à être en désaccord avec les mesures et les actions en lien avec les questions pratiques collectives et position du CIRAD. 
+
+Pour les questions du groupe pratiques collectives liées à la mobilité, deux profils se détachent à savoir les individus qui sont pour un changement collectif afin de réduire l'effet qu'a la mobilité en réponse à l'urgence climatique et les individus qui pensent qu'un changement du point de vue collectif ne changera en rien l'effet de la mobilité en réponse à l'urgence climatique.
+
+Pour les questions du groupe avis sur la position du CIRAD liées à la mobilité, nous constatons que pour la majeure partie des actions proposées; les individus qui ont tendance à être en désaccord avec les mesures et les actions en réponse à l'urgence climatique donnent des réponses mitigées sauf pour deux actions :
+
+$Q3.10$ : \textit{Changements dans les critères d’évaluations de carrière (Ex : moins de poids au nombre de conférenceset de séminaires invités, nombre de réunions à haut niveau ; plus de poids aux efforts de réduction des impactsenvironnementaux de nos activités)} où les individus sont majoritairement défavorables à la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD.
+
+Et $Q3.12$ : \textit{Mise en place par le Cirad de mesures incitatives pour utiliser des modes de déplacement domicile- travail sobres en carbone} où les individus sont majoritairement favorables à la mise en place de cette action afin de réduire l'empreinte environnementale du CIRAD.
+
+Nous noterons aussi pour ces questions du groupe avis sur la position du CIRAD liées à la mobilité, que sur la première bissectrice, de façon globale la mise en place des actions afin de réduire l'empreinte environnementale du CIRAD est fortement recommandée sauf pour les actions $Q3.8$, $Q3.9$ et $Q3.10$.
+
+\section{Classification hiérarchique combinée avec une analyse factorielle}
+
+```{r cah}
+clu_acm<- HCPC(res.mca, graph= FALSE)
+clu_mfa_imputation<- HCPC(res.NA.MFA, graph=FALSE)
+```
+
+L'objectif de cette partie est de regrouper nos individus en cluster (groupes) correspondant aux différents profils que nous avons obtenu grace aux analyses précédentes.
+
+En appliquant la classification sur les résultats de l'analyse des correspondances multiples (ACM), $3$ clusters se détachent de notre analyse. on peut l'observer sur le graphe ci-dessous : 
+
+```{r, include=TRUE, echo=FALSE, fig.height=4, fig.cap="Cluster dendogram - ACM", fig.align='center', fig.pos="H"}
+fviz_dend(clu_acm, show_labels = FALSE)
+```
+
+Nous allons donc appliquer notre algorithme de classification sur les résultats de l'analyse factorielle multiple (MFA) afin de voir si ces résultats obtenus sur l'ACM pourraient être améliorés.
+
+\subsection{Classification ascendante sur MFA}
+
+```{r, include=TRUE, echo=FALSE, fig.height=4, fig.cap="Cluster dendogram - MFA", fig.align='center', fig.pos="H"}
+fviz_dend(clu_mfa_imputation, show_labels = FALSE)
+```
+
+```{r, include=TRUE, echo=FALSE, fig.height=3.5, fig.cap="Factor map - MFA", fig.align='center', fig.pos="H"}
+fviz_cluster(clu_mfa_imputation, geom = "text")
+
+```
+
+Sur les figures $3.35$ et $3.36$, les individus sont regroupés en $5$ clusters.
+Le cluster $1$ (rouge) est composé de $172$ individus; le cluster $2$ (jaune) est composé de $15$ individus; le cluster $3$ (vert) est composé de $146$ individus; le cluster $4$ (bleu) est composé de seulement $5$ individus et le cluster $5$ (violet) est composé de $26$ individus. Donc les clusters avec les couleurs \textit{bleue} et \textit{jaune} sont les moins représentés. Un regroupement pourrait être envisagé si cela est nécessaire.
+
+Nous allons maintenant décrire nos clusters. Connaissant donc ce qui caractérise nos axes obtenus lors de MFA, on va tracer le nuage de points des individus en fonction des clusters obtenus afin de mieux décrire nos clusters.
+
+```{r}
+donne2<- clu_mfa_imputation$data.clust
+res2<- MFA(donne2, group = c(2,9,13,5),
+                name.group = c("Pratiques collectifs","Pratiques individuels",
+                               "Position CIRAD","socio-démographique"),
+                type=c("n","n","n","n"),num.group.sup = 4,graph=FALSE)
+```
+
+- \textbf{Nuage de points des individus en fonction des clusters sur le plan $1-2$}
+
+Sur ce plan $1-2$, nous voyons effectivement sur la figure $3.37$, les profils de nos individus qui décrivent les clusters \textit{rouge}, \textit{vert} et \textit{violet}.
+
+En effet, comme on l'avait remarqué lors de l'interprétation du nuage de points avec l'ACM/MFA, les individus qui décrivent le cluster \textit{violet} ont tendance à être en désaccord avec les mesures et les actions liées surtout aux questions du groupe pratiques collectives et position du CIRAD en réponse à l'urgence climatique.
+
+Les individus qui décrivent le cluster \textit{rouge} ont tendance à être dans l'acceptation des mesures et des actions liées surtout aux questions du groupe pratiques collectives et position CIRAD en réponse à l'urgence climatique.
+
+Les individus qui décrivent le cluster \textit{vert} ont tendance à être moyennement d'accord avec les mesures et des actions liées surtout aux questions du groupe pratiques collectives et position CIRAD.
+
+Par contre, nous observons que les individus décrivant le cluster \textit{jaune} sont très proches d'une part du cluster \textit{rouge}, du cluster \textit{vert} et d'autre part du cluster \textit{bleu}. 
+On peut notamment les associer à ces clusters; mais voyons ce qui caractérise les individus de ce cluster et aussi du cluster \textit{bleu}.
+
+```{r, include=TRUE, echo=FALSE, fig.height=4, fig.cap="Nuage de points des individus en fonction des clusters : plan 1-2", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res2, 
+             habillage = "clust", # color by groups 
+             axes = c(1,2), 
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var"
+)
+```
+
+- \textbf{Nuage de points des individus en fonction des clusters sur le plan $2-3$}
+
+Sur ce plan $2-3$, nous pouvons distinguer maintenant sur la figure $3.38$, les individus qui décrivent les clusters \textit{jaune} et \textit{bleu}. 
+Or, grace à la partie précédente, nous savons que l'axe $3$ caractérise plus les individus qui ont tendance à ne pas se prononcer surtout sur les questions du groupe pratiques collectives et position du CIRAD.
+
+Donc, le cluster \textit{bleu} caractérise les individus qui ont tendance à ne pas se prononcer surtout sur les questions pratiques collectives et position du CIRAD.
+
+Le cluster \textit{jaune} caractérise aussi les individus qui ont tendance à ne pas se prononcer sur les questions pratiques collectives et position CIRAD mais tout en étant d'accord et moyennement d'accord avec certaines questions de ces deux groupes.
+
+```{r, include=TRUE, echo=FALSE, fig.height=4, fig.cap="Nuage de points des individus en fonction des clusters : plan 2-3", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res2, 
+             habillage = "clust", # color by groups 
+             axes = c(2,3), 
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var"
+)
+```
+
+- \textbf{Nuage de points des individus en fonction des clusters sur le plan $3-4$}
+
+```{r, include=TRUE, echo=FALSE, fig.height=4, fig.cap="Nuage de points des individus en fonction des clusters : plan 3-4", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res2, 
+             habillage = "clust", # color by groups 
+             axes = c(3,4), 
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var"
+)
+```
+
+Nous savons déjà que l'axe $4$ caractérise surtout les individus qui ont tendance à répondre à des questions du groupe pratiques individuelles.
+
+Sur la figure $3.39$, nos clusters obtenus n'ont pas une différence significative sur l'axe $4$ (pas de cluster qui se détache par rapport à un autre cluster). Ainsi, pour ces questions du groupe pratiques individuelles, il n'y a pas de distinction concernant nos différents profils obtenus en réponse à l'urgence climatique.
+
+Nous retenons donc $4$ clusters pour décrire notre base de données. En effet, nous allons regrouper le cluster jaune composé de $15$ individus avec les clusters vert et rouge. Ainsi le cluster rouge sera composé de $173$ individus au lieu de $172$ et le cluster vert sera composé de $160$ individus au lieu de $146$.
+
+```{r, include=FALSE}
+#### on enlève de la base les individus ayant au moins un NA ######################
+indligneNA.mfa <- which(is.na(enquete4.MFA),arr.ind = TRUE)[,1] # indice des lignes dans la colonne 1
+length(unique(indligneNA.mfa)) # 74 individus ont au moins une donnée manquante
+enquete4.mfa_sans_NA<- enquete4.MFA[-indligneNA.mfa,]
+
+
+res.MFA<- MFA(enquete4.mfa_sans_NA, group = c(2,9,13,4),
+              name.group = c("Pratiques collectifs","Pratiques individuels",
+                             "Position CIRAD","socio-démographique"),
+              type=c("n","n","n","n"),num.group.sup = 4,graph=FALSE)
+```
+
+```{r}
+clu_mfa<- HCPC(res.MFA, graph=FALSE)
+```
+
+```{r}
+donne2.bis<- clu_mfa$data.clust
+res2.bis<- MFA(donne2.bis, group = c(2,9,13,5),
+                name.group = c("Pratiques collectifs","Pratiques individuels",
+                               "Position CIRAD","socio-démographique"),
+                type=c("n","n","n","n"),num.group.sup = 4,graph=FALSE)
+```
+
+Ce choix a été fait car en effectuant notre algorithme de classification sur la base de données sans données manquantes (sans les 74 valeurs manquantes), nous constatons que parmi les $15$ individus du cluster jaune, $14$ ont été regroupés dans le cluster vert et un seul individu dans le cluster rouge. On peut l'observer sur le graphe suivant : 
+
+
+```{r, include=TRUE, echo=FALSE, fig.height=4, fig.cap="Nuage de points en fonction des clusters - MFA en enlèvant les données manquantes", fig.align='center', fig.pos="H"}
+fviz_mfa_ind(res2.bis, 
+             habillage = "clust", # color by groups 
+             axes = c(2,3), 
+             addEllipses = TRUE, ellipse.type = "confidence", invisible = "quali.var"
+)
+```
+
+\section{Conclusion}
+
+Pour conclure, grace à ces méthodes d'analyse multifactorielle et de classification sur les données des questions fermées du questionnaire, nous avons pu aboutir à une typologie avec la mise en évidence de profils-type.
+
+Nous avons donc $4$ clusters ou profils qui se détachent de notre base de données composées de $364$ observations et $28$ questions.
+
+Un premier cluster \textit{Pro changement} $<<rouge>>$, comprenant $173$ individus qui ont tendance à être dans l'acceptation des mesures et actions en réponse à l'urgence climatique.
+
+Un deuxième cluster \textit{Nuancés} $<<vert>>$, comprenant $160$ individus qui ont tendance à être moyennement d'accord avec les mesures et actions en réponse à l'urgence climatique.
+
+Un troisième cluster \textit{Réticents} $<<violet>>$, comprenant $26$ individus qui ont tendance à être en désaccord avec les mesures et les actions en réponse à l'urgence climatique.
+
+Un quatrième cluster \textit{Ne se prononce pas} $<<jaune>>$, comprenant $5$ individus qui ont tendance à ne pas se prononcer.
+
+Ces $28$ questions ont été catégorisées en $4$ groupes afin d'approfondir nos interprétations.
+Ainsi nos $4$ clusters cités précédemment sont tous liés aux questions du groupe pratiques collectives et position du CIRAD.
+Par contre, nous avons remarqué que les profils type de nos $4$ clusters qui se détachent de notre étude n'ont pas de différence significative dans le fait de répondre aux questions concernant les avis sur les pratiques individuelles.
+
+D'où, nous voyons qu'une différence d'opinions se détache uniquement sur des questions concernant les pratiques collectives et la position du CIRAD en réponse à l'urgence climatique.
+
+De plus, en analysant les questions socio-démographiques, nous avons remarqué que l'âge n'a pas d'effet sur nos différents profils. Par contre, la majeure partie des individus qui composent le groupe $3$ sont des chercheur.es, de genres \textit{masculin} - \textit{autre} avec comme champ d'activité la \textit{recherche} et l'\textit{appui}.
+
+Voici joint un tableau, synthétisant les résultats obtenus pour l'analyse des questions fermées : 
+
+```{r}
+tab<- read_excel(here::here("data/tab_synthese.xlsx"), col_names = TRUE, skip = 1) %>% 
+  as.data.frame()
+rownames(tab)<- c("Q. Pratiques individuelles","Q. Pratiques collectives", "Q. Pratiques institutionnelles")
+tab<- tab[,-1]
+```
+
+
+```{r , include=TRUE}
+tab %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = " Synthèse des résultats ", label = "tab1")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+\chapter{Chapitre IV : Analyse des questions ouvertes}
+\section{Introduction}
+
+L'objectif de cette partie est d'approfondir l'interprétation des résultats de l'analyse quantitative des questions fermées.
+
+Pour cela, une analyse des commentaires recueillis pour le questionnaire devra être réalisée avec des méthodes de fouille de textes.
+
+Cela permettra d'identifier différentes catégories de points de vue.
+
+Nous avons vu qu'il y a $16$ questions ouvertes pour le questionnaire. $15$ questions ont été gardées pour la suite car l'une des questions ouvertes comportait beaucoup de données manquantes. C'est le commentaire associé à la question champ principale d'activité. Pour les $15$ questions ouvertes restantes, $14$ sont liées aux $3$ groupes de questions à savoir : \textit{Pratiques collectives}, \textit{Pratiques individuelles} et \textit{Position du Cirad}. 
+
+L'autre question ouverte concerne les commentaires ou suggestions en lien avec les actions possibles pour réduire l'empreinte environnementale du CIRAD.
+
+Deux possibilités d'analyse ont été mises en place : 
+
+La première possibilité consiste à appliquer le texte mining. Il consiste à traduire la collection des commentaires en un tableau de données dont les lignes sont les commentaires associés à un individu et les colonnes des mots. Nous observons déjà un problème de dimensionnalité : nombre de colonnes trop important car à une colonne on associe un mot. 
+
+Grâce à ce tableau de données, on peut mesurer par exemple la similarité entre les commentaires ou identifier les mots les plus fréquents.
+
+La deuxième possibilité consiste à faire une analyse de contenu dont l'objectif est de comprendre le message derrière chaque commentaire. L'idée est de faire une grille de lecture pour chaque groupe de questions à savoir \textit{Pratiques collectives}, \textit{Position du CIRAD} et \textit{Pratiques individuelles} en créant des hypothèses fortes ou codes afin de caractériser nos clusters obtenus précédemment (la raison de sélection des individus extrêmes de chaque cluster, statistiques descriptives, test de corrélation etc.).
+
+Cependant, pour la suite de cette partie, nous nous baserons essentiellement sur la deuxième possibilité.
+
+Concernant la première possibilité, nous allons juste faire une analyse fréquentielle sur les commentaires ou suggestions en lien avec les actions possibles pour réduire l'empreinte environnementale du CIRAD afin de faire ressortir les mots les plus récurrents.
+
+\section{Analyse fréquentielle}
+
+```{r}
+# importation donne
+text_Q<- readLines(here::here("data/Q.txt"))
+
+doc_ids_Q <- c(1:34)
+
+df_Q <- data.frame(doc_id = doc_ids_Q, text = text_Q, stringsAsFactors = FALSE)
+corpus_Q <- Corpus(DataframeSource(df_Q))
+
+# Convertir le texte en minuscule
+corpus_Q <- tm_map(corpus_Q, content_transformer(tolower))
+
+# Supprimer les nombres
+corpus_Q <- tm_map(corpus_Q, removeNumbers)
+
+# Supprimer les mots vides français
+
+corpus_Q <- tm_map(corpus_Q, removeWords, stopwords("fr"))
+
+# Supprimer les ponctuations
+corpus_Q <- tm_map(corpus_Q, removePunctuation)
+
+# Supprimer les espaces vides supplémentaires
+corpus_Q <- tm_map(corpus_Q, stripWhitespace)
+
+# Supprimer votre propre liste de mots non désirés
+corpus_Q <- tm_map(corpus_Q, removeWords, c("questions","manquent","injustes","mettre",
+                                            "dont","sud","semble","autres","vaut","verts",
+                                            "inrae","ird","faire","autre","cas","chaque",
+                                            "arrivait","mette","toutes","compte","articule",
+                                            "oui","doit","individuel","voir","annuel",
+                                            "entretien","ademe","démarche","pluie","espaces","sincérité",
+                                            "prendre","faire","être","ceux","dom","site","incomplètes",
+                                            "billets","dom","plus","envoi","donne","toutes","complexes",
+                                            "cidessus","grand","avant","rendre","lieu","coût","mesures",
+                                            "interessant","parait","certaines","faut","fait","etc","cirad", "Vs","tout","très","non","comme",
+                                            "ça","donc","quand","aussi","bien","bonne","sait","où")) 
+
+# Text stemming
+#corpus_Q1 <- tm_map(corpus_Q1, stemDocument)
+dtm_Q <- TermDocumentMatrix(corpus_Q)
+
+#dtm_Q<- TermDocumentMatrix(corpus_Q)
+dtm_Q<- weightTfIdf(dtm_Q, normalize=TRUE)
+m_Q <- as.matrix(dtm_Q)
+m_Qt<- t(m_Q)
+v <- sort(rowSums(m_Q),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+```
+
+Comme énoncé dans l'introduction, nous allons faire une analyse fréquentielle sur les commentaires ou suggestions en lien avec les actions possibles pour réduire l'empreinte environnementale du CIRAD.
+
+Nous avons $34$ commentaires pour cette question.
+L'idée est de traduire la collection de commentaires en un tableau de données attributs-valeurs (dictionnaire).
+La question qu'on se pose est de savoir que mettre en colonnes et quelles valeurs mettre dans le tableau ?
+
+Nous allons repérer les mots présents dans les commentaires qui vont constituer les colonnes du tableau de données. Les mots deviennent des descripteurs (termes).
+
+La dimensionnalité est souvent très élevée car le nombre de colonnes peut excéder le nombre de lignes. Pour réduire cette dimensionnalité nous avons faits les nettoyages suivants : 
+
+- retrait des chiffres
+
+- retrait des mots vides (mot non porteur de sens dans un commentaire comme par exemple les prépositions, pronoms, etc.)
+
+- retrait des ponctuations
+
+- suppression des espaces vides supplémentaires
+
+- retrait des mots non désirés
+
+Pour les valeurs du tableau de données, nous avons utilisé la pondération \textit{TF-IDF} qui permet de relativiser l'importance d'un terme dans un commentaire (TF : term frequency) par son importance dans le corpus (ensemble des commentaires) (IDF : Inverse document frequency). Voici la formule qui permet de la calculer :
+
+\begin{center}
+  $tfidf(t,d,D) = \frac{f_{t,d}}{\sum_{t^{'},d} (f_{t^{'},d})} \log_2 \frac{N}{n_t}$
+\end{center}
+
+avec : 
+
+- t : terme (mot)
+- d : commentaire
+- D : ensemble des commentaires (corpus)
+- $f_{t,d}$ : nombre de termes présents dans le commentaire
+- N : nombre de commentaires dans le corpus
+- $n_t$ : nombre de commentaires où le terme apparaît
+
+Donc, le $TF$ mesure l'importance du terme (mot) dans un commentaire alors que l'$IDF$ mesure l'importance d'un terme dans le corpus.
+
+D'où, chaque commentaire sera représenté par un vecteur ayant les valeurs de la pondération.
+On peut l'observer sur le tableau suivant donnant les valeurs de la pondération pour $10$ mots et $6$ commentaires : 
+
+```{r , include=TRUE}
+head(m_Qt[,1:10]) %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "  Matrice DocumentTerm en utilisant la pondération TF-IDF ", label = "tab2")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 7)
+```
+
+
+À partir de ce tableau, nous allons créer la matrice des fréquences de mots en calculant la somme pour chaque ligne de la matrice \textit{TermDocument} de pondération \textit{TF-IDF}. Cette matrice aura $2$ colonnes; la première colonne désignant les mots et la seconde colonne, les fréquences d'apparition des mots classés sous ordre décroissant.
+
+Nous allons donc générer le nuage de mots pour faire ressortir les mots les plus importants dans notre texte.
+
+
+```{r, include=TRUE, fig.align='center', fig.cap="Nuage de mots : actions possibles pour réduire l'empreinte environnementale du CIRAD", fig.align='center', fig.pos="H"}
+# nuage de mot
+wordcloud(words = d$word, freq = d$freq, min.freq = 0.5,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+Sur la figure $4.1$, nous observons que la priorisation du \textit{télétravail} est l'action la plus recommandée pour réduire l'empreinte environnementale du CIRAD.
+
+\section{Traitement des données qualitatives des questions ouvertes}
+
+Comme énoncé dans l'introduction, l'objectif de cette partie est de mieux comprendre le message derrière chaque commentaire. Pour cela, nous allons regrouper pour chaque groupe de questions, les commentaires associés; puis faire une grille de lecture en créant des hypothèses fortes ou codes.
+
+Commençons par les commentaires associés au groupe de question sur les pratiques collectives, puis nous verrons les commentaires associés aux groupes de question sur les pratiques individuelles et institutionnelles.
+
+\subsection{Commentaires associés au groupe de questions : Pratiques collectives}
+
+Ce groupe contient $2$ questions, pour lesquelles $103$ individus ont donné des commentaires. Les thèmes abordés portent sur la recherche et l'urgence climatique.
+
+Après une lecture approfondie des $103$ commentaires associés à ce groupe de questions, nous avons créé des codes ou thèmes en regroupant les commentaires qui ont les mêmes idées.
+$13$ codes ressortent de cette analyse. Voici un tableau, donnant la signification des codes ou thèmes : 
+
+```{r}
+code_PC<- read_excel(here::here("data/Codes_PC.xlsx"), col_names = TRUE, skip = 1) %>% 
+  as.data.frame()
+```
+
+```{r , include=TRUE}
+code_PC %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = " Signification des codes pour les commentaires du groupe pratiques collectives ", label = "tab3")%>%
+  kable_styling(latex_options = c("striped","scale_down", "HOLD_position", "repeat_header"), font_size = 8, full_width = TRUE, bootstrap_options = c("condensed"))
+```
+
+Ainsi, un codage binaire a été associé à chaque code (présence - absence) c'est-à-dire un individu ayant donné un commentaire pour un code aura comme valeur $1$ sinon $0$. À noter, qu'un même individu peut appartenir à plusieurs codes.
+
+Nous allons comptabiliser pour chaque code, le nombre de commentaire donné par un individu en fonction des $clusters$.
+Voici le tableau correspondant : 
+
+```{r}
+
+chi2_names<- excel_sheets(here::here("data","tableau_test_chi2.xlsx"))
+
+for(name in chi2_names){
+  name2 <- paste0("sheet_",name) #modification du nom de la feuille 
+  data<- read_excel(here::here("data","tableau_test_chi2.xlsx"), sheet = name, col_names = TRUE, skip = 1)
+  #data$sheet <- name
+  assign(name2,data)  
+  rm(name, name2,data)
+}
+
+sheet_PC<- sheet_PC[,-1]
+sheet_PCD<- sheet_PCD[,-1]
+sheet_PI<- sheet_PI[,-1]
+
+rownames(sheet_PC)<- c("cluster_Pro changement","cluster_Nuancés", "cluster_Réticents", "cluster_Ne se prononce pas")
+rownames(sheet_PCD)<- c("cluster_Pro changement","cluster_Nuancés", "cluster_Réticents", "cluster_Ne se prononce pas")
+rownames(sheet_PI)<- c("cluster_Pro changement","cluster_Nuancés", "cluster_Réticents", "cluster_Ne se prononce pas")
+
+sheet_PC<- t(sheet_PC)
+sheet_PCD<- t(sheet_PCD)
+sheet_PI<- t(sheet_PI)
+```
+
+```{r , include=TRUE}
+sheet_PC %>%
+  kable("latex", booktabs = T, longtable=TRUE, caption = " Groupe pratiques collectives : nombre de commentaire dans chaque code en fonction des clusters ", label = "tab4")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position","repeat_header"), full_width = TRUE, font_size = 9, bootstrap_options = c("condensed"))
+```
+
+En analysant les commentaires associés à ce groupe de questions \textit{avis sur les pratiques collectives}, nous remarquons qu'il y'a différentes idées qui émergent. Regardons en détails certains codes.
+
+- \textit{Pro.changement\_sol\_empreinte.transport.P}
+
+Ce code concerne les commentaires associés aux individus qui proposent des solutions pour diminuer l'empreinte transport des pratiques d'activités au niveau collectif. Nous remarquons dans la table $4.3$ que $24$ individus appartenant aux \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés}  proposent des solutions contre seulement $4$ individus pour le \textit{cluster\_Réticents} et $1$ seul individu pour le \textit{cluster\_Ne se prononce pas}. Cette différence très significative était prévisible car le \textit{cluster\_Pro changement} et le \textit{cluster\_Nuancés} décrivent respectivement les individus qui ont tendance à être dans l'acceptation et moyennement d'accord avec les mesures et les actions en réponse à l'urgence climatique.
+
+Intéressons-nous aux $4$ individus du \textit{cluster\_Réticents} qui proposent des solutions afin de diminuer l'empreinte transport des pratiques d'activités. En effet, nous avons vu que le \textit{cluster\_Réticents} décrit les individus qui ont tendance à être en désaccord avec les actions et les mesures en réponse à l'urgence climatique et que ce désaccord est lié à des questions appartenant aux avis sur les pratiques collectives et sur la position du CIRAD.
+
+Cependant, $4$ individus de ce cluster sont favorables pour la diminution de l'empreinte transport des pratiques d'activités. Voici quelques commentaires donnés dans ce tableau ci-dessous : 
+
+```{r}
+sheet_names <- excel_sheets(here::here("data","tableau_qualitatif.g.xlsx"))
+
+for(name in sheet_names){
+  name2 <- paste0("sheet_",name) #modification du nom de la feuille 
+  data<- read_excel(here::here("data","tableau_qualitatif.g.xlsx"), sheet = name, col_names = TRUE, skip = 1)
+  data$sheet <- name
+  assign(name2,data)  
+  #rm(name, name2,data)
+}
+
+c_1<- sheet_TPC[c(69,72),c(2,4)]
+c_2<- sheet_TPC[c(1), c(2,20)]
+c_3<- sheet_TPC[c(28,69),c(2,26)]
+
+c1<- sheet_TPCD[c(6,12,36,94),c(2,8)]
+c1b<- sheet_TPCD[c(8,41),c(2,8)]
+c2<- sheet_TPCD[c(67, 91),c(2,14)]
+c3<- sheet_TPCD[c(29),c(2,16)]
+
+c4<- sheet_TPCD[c(23,49),c(2,22)]
+c5<- sheet_TPCD[c(94),c(2,22)]
+c6<- sheet_TPCD[c(8,20),c(2,22)]
+c7<- sheet_TPCD[c(19,28),c(2,22)]
+
+c.1<- sheet_TPI[c(78,107,111,171,212),c(3,4)]
+c.2<- sheet_TPI[c(28,294),c(3,16)]
+c.3<- sheet_TPI[c(241,294),c(3,22)]
+c.4<-sheet_TPI[c(78,107),c(3,22)]
+c.5<-sheet_TPI[c(50),c(3,24)]
+c.6<-sheet_TPI[c(28,127,137),c(3,24)]
+```
+
+
+```{r , include=TRUE}
+c_1 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes Pro.changement.sol.empreinte.transport.P  ", label = "tab5")%>%
+  kable_styling(latex_options = c("scale_down","HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Nuances\_contraintes.déplacements.P}
+
+Ce code concerne les commentaires donnés par les individus qui ont une difficulté à se positionner sur certains déplacements qu'ils trouvent nécessaires au niveau collectif. Nous voyons dans la table $4.3$ que seulement $4$ individus du \textit{cluster\_Réticents} ont donné des commentaires pour ce code. Cependant, nous voyons que parmi les individus du \textit{cluster\_Pro changement} (acceptation des mesures et des actions en réponse à l'urgence climatique) $10$ individus pensent que certains déplacements sont nécessaires dès fois. Regardons quelques commentaires associés à ces individus dans le tableau ci-dessous :
+
+
+```{r , include=TRUE}
+c_2 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Pro changement : commentaires associés aux codes Nuances.contraintes.déplacements.P  ", label = "tab6")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Contre.changement\_critique.P}
+
+Ce code concerne les commentaires associés aux individus qui ne sont pas d'accord avec les mesures et les actions et sont dans le critique notamment sur la formulation de la question au niveau collectif. Nous remarquons dans la table $4.3$, parmi les $4$ \textit{clusters}, seul le \textit{cluster\_Réticents} a plus de commentaires ($5$) pour ce code. Regardons quelques commentaires apportés par ces $5$ individus de ce cluster dans le tableau ci-dessous : 
+
+```{r , include=TRUE}
+c_3 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes Contre.changement.critique.P  ", label = "tab7")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+En résumé, pour les commentaires associés à ce groupe de questions \textit{Pratiques collectives}; les codes les plus significatifs pour le \textit{cluster\_Pro changement} sont les diminutions de l'empreinte transport et énergie des pratiques d'activités et l'importance de certains déplacements. 
+Pour le \textit{cluster\_Nuancés}, les codes les plus significatifs sont les diminutions de l'empreinte transport, énergie et déchet des pratiques d'activitées et l'importance de certains déplacements (nécessaires et utiles).
+
+Pour le \textit{cluster\_Réticents}, diminution de l'empreinte transport des pratiques d'activitées, l'importance de certains déplacements et contre changement des pratiques d'activités (critique) sont les codes les plus significatifs.
+
+\subsection{Commentaires associés au groupe de questions : Position du Cirad}
+
+Ce groupe contient $3$ questions, pour lesquelles $101$ individus ont donné des commentaires. Les thèmes abordés portent sur le CIRAD et l'urgence climatique.
+
+Comme pour les commentaires associés au groupe de questions \textit{Pratiques collectives}, après une lecture approfondie des $101$ commentaires associés à ce groupe de questions, nous avons créé des codes ou thèmes en regroupant les commentaires qui ont les mêmes idées.
+$15$ codes ressortent de cette analyse. Voici un tableau, donnant la signification des codes ou variables : 
+
+```{r}
+code_PCD<- read_excel(here::here("data/Codes_PCD.xlsx"), col_names = TRUE, skip = 1) %>% 
+  as.data.frame()
+```
+
+```{r , include=TRUE}
+code_PCD %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = " Signification des codes pour les commentaires du groupe position du Cirad ", label = "tab8")%>%
+  kable_styling(latex_options = c("striped","scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9, bootstrap_options = c("condensed"))
+```
+
+De même, nous allons comptabiliser pour chaque code, le nombre de commentaires donnés par un individu en fonction des $clusters$.
+Voici le tableau correspondant :
+
+```{r , include=TRUE}
+sheet_PCD %>%
+  kable("latex", booktabs = T, longtable=TRUE, caption = " Groupe position du CIRAD : nombre de commentaire dans chaque code en fonction des clusters ", label = "tab9")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position","repeat_header"), full_width = TRUE, font_size = 9,  bootstrap_options = c("condensed"))
+```
+
+En analysant les commentaires associés à ce groupe de questions \textit{avis sur la position du CIRAD}, différentes idées (thèmes ou codes) émergent. Regardons en détails certains codes.
+
+- \textit{Pro.changement\_critique.ee.a.ges}
+
+Ce code concerne les commentaires associés aux individus qui sont dans le critique du $CIRAD$ notamment sur leurs empreintes environnementales, leurs activités de recherche ou leurs émissions de gaz à effet de serre. Il concerne aussi les commentaires donnés par les individus qui sont dans le critique notamment sur la formulation de la question. Nous remarquons dans la table $4.8$ que la majeure partie des individus qui ont donné des commentaires pour ce code, appartiennent aux \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés} avec respectivement $17$ et $9$ commentaires. Regardons quelques commentaires du \textit{cluster\_Nuancés} pour ce code dans le tableau ci-dessous : 
+
+```{r , include=TRUE}
+c1 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Nuancés : commentaires associés aux codes Pro.changement.critique.ee.a.ges  ", label = "tab10")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+
+Nous notons également $4$ individus du \textit{cluster\_Réticents} qui ont donné des commentaires pour ce code. Les individus de ce cluster ont tendance à être en désaccord avec les actions et les mesures en réponse à l'urgence climatique. Regardons quelques commentaires apportés par ces individus dans le tableau ci-dessous : 
+
+```{r , include=TRUE}
+c1b %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes Pro.changement.critique.ee.a.ges  ", label = "tab11")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Pro.changement\_limites.pointées.empreinte.transport}
+
+Ce code concerne les commentaires donnés par les individus qui pointent comme limite l'empreinte transport des activités de recherche en majeure partie du CIRAD et proposent des solutions afin d'y remédier. Ainsi, dans la table $4.8$, nous remarquons qu'uniquement les individus du \textit{cluster\_Pro changement} et du \textit{cluster\_Nuancés} ont donné des commentaires pour ce code. Regardons quelques commentaires du \textit{cluster\_Nuancés} pour ce code : 
+
+```{r , include=TRUE}
+c2 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Nuancés : commentaires associés aux codes Pro.changement.limites.pointées.empreinte.transport  ", label = "tab12")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+
+- \textit{Pro.changement\_limites.pointées.gouvernance.tutelles.ee.a.ges}
+
+Ce code concerne les commentaires donnés par les individus qui pointent comme limite la gouvernance (hiérarchie, directions, unités, départements, ministères etc ...). De même, nous observons dans la table $4.8$ que la majeure partie des individus ayant donné un commentaire pour ce code appartiennent aux \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés}. Par contre, un seul individu du \textit{cluster\_Réticents} pense qu'il faut un changement au niveau de la hiérarchie (gouvernance) en réponse à l'urgence climatique. Voici le commentaire de cet individu dans le tableau ci-dessous : 
+
+```{r , include=TRUE}
+c3 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes Pro.changement.limites.pointées.gouvernance.tutelles  ", label = "tab13")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Contre.changement.critique.ee.a.ges}
+
+Ce code concerne les commentaires donnés par les individus qui sont contre le changement de leurs empreintes environnementales, leurs activités de recherche ou de leurs émissions de gaz à effet de serre en réponse à l'urgence climatique et qui donnent des explications sur ce qui les freine. 
+
+Ainsi, dans la table $4.8$, nous observons que pour ce groupe de questions \textit{Position du CIRAD} peu d'individu ont donné des commentaires pour ce code. Regardons dans les tableaux ci-dessous, les commentaires donnés pour les $4$ clusters.
+
+```{r , include=TRUE}
+c4 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Pro changement : commentaires associés aux codes Contre.changement.critique  ", label = "tab14")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+```{r , include=TRUE}
+c5 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Nuancés : commentaires associés aux codes Contre.changement.critique  ", label = "tab15")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+```{r , include=TRUE}
+c6 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes Contre.changement.critique  ", label = "tab16")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+```{r , include=TRUE}
+c7 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Ne se prononce pas : commentaires associés aux codes Contre.changement.critique  ", label = "tab17")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+En résumé, pour les commentaires associés à ce groupe de questions \textit{Position du CIRAD}; les codes les plus significatifs pour le \textit{cluster\_Pro changement} sont : l'exemplarité et la cohérence au travail, critique du CIRAD notamment sur leurs empreintes environnementales, diminution de l'empreinte transport des activités de recherche en majeure partie du CIRAD et un changement nécessaire au niveau de la gouvernance.
+
+Pour le \textit{cluster\_Nuancés}, les codes les plus significatifs sont : l'exemplarité et la cohérence au travail, l'empreinte transport des activités de recherche en majeure partie du CIRAD, critique du CIRAD notamment sur leurs empreintes environnementales.
+
+Pour le \textit{cluster\_Réticents}, les codes les plus significatifs sont : critique du CIRAD sur leurs empreintes environnementales et \textit{nuances\_gouvernance.tutelles}.
+
+\subsection{Commentaires associés au groupe de questions : Pratiques individuelles}
+
+Ce groupe contient $9$ questions, les thèmes abordés portent sur le positionnement individuel au travail en lien avec l'urgence climatique.
+
+Comme pour les parties précédentes, après une lecture approfondie des commentaires associés à ce groupe de questions, nous avons crée des codes ou thèmes en regroupant les commentaires qui ont les mêmes idées. $23$ codes ressortent de cette analyse. Voici un tableau, donnant la signification des codes ou variables : 
+
+
+```{r}
+code_PI<- read_excel(here::here("data/Codes_PI.xlsx"), col_names = TRUE, skip = 1) %>% 
+  as.data.frame()
+```
+
+
+```{r , include=TRUE}
+code_PI %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = " Signification des codes pour les commentaires du groupe pratiques individuelles ", label = "tab18")%>%
+  kable_styling(latex_options = c("striped","scale_down", "HOLD_position", "repeat_header"), font_size = 9, full_width = TRUE, bootstrap_options = c("condensed"))
+```
+
+De même, nous allons comptabiliser pour chaque code, le nombre de commentaires donnés par un individu en fonction des $clusters$. Voici le tableau correspondant :
+
+```{r , include=TRUE}
+sheet_PI %>%
+  kable("latex", booktabs = T, longtable=TRUE, caption = " Groupe pratiques individuelles : nombre de commentaire dans chaque code en fonction des clusters ", label = "tab19 ")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position","repeat_header"), full_width = TRUE, font_size = 9, bootstrap_options = c("condensed"))
+```
+
+En analysant les commentaires associés à ce groupe de questions \textit{avis sur les pratiques individuelles}, differentes idées émergent. Regardons en détails certains codes.
+
+- \textit{oui\_empreinte.transport.s.p.ec.ac.pm}
+
+Ce code concerne les commentaires associés aux individus qui ont évolué leurs pratiques ou sujets de recherche, leurs empreintes carbone et leurs pratiques de mobilités afin de diminuer l'empreinte transport de leurs activités. Ainsi, nous remarquons dans la table $4.18$ que pour ce code, $73$ individus du \textit{cluster\_Pro changement} ont donné des commentaires, $52$ individus du \textit{cluster\_Nuancés} et $8$ individus seulement du \textit{cluster\_Réticents}.
+Tous les individus du \textit{cluster\_Ne se prononce pas} ont donné un commentaire pour ce code. Ce cluster décrit les individus qui ont tendance à ne pas se prononcer sur les actions et les mesures en réponse à l'urgence climatique.
+Regardons les commentaires donnés par ces individus pour ce code : 
+
+```{r , include=TRUE}
+c.1 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Ne se prononce pas : commentaires associés aux codes oui.empreinte.transport  ", label = "tab20")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Critique.s.p.ec}
+
+Ce code concerne les commentaires donnés par les individus qui sont prêts à évoluer leurs sujets ou pratiques de recherche. Ces individus sont dans le critique et pensent qu'il faut agir vite. Ainsi, nous observons dans la table $4.18$, que les individus ayant donné plus de commentaires pour ce code appartiennent aux \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés} avec respectivement $16$ et $9$ commentaires. Cependant, $3$ individus du \textit{cluster\_Réticents} ont donné des commentaires. Regardons dans le tableau ci-dessous les commentaires donnés par $2$ de ces individus : 
+
+```{r , include=TRUE}
+c.2 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes critique.s.p.ec  ", label = "tab21")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Non.encouragement\_gouvernance.tutelles.p.ac}
+
+Ce code concerne les commentaires associés aux individus qui ont l'intention d'évoluer leurs pratiques de recherche ou entreprendre des actions collectives en réponse à l'urgence climatique mais, ils ne sont pas encouragés par la hiérarchie. Ainsi, nous observons dans la table $4.18$, que les individus ayant donné plus de commentaires pour ce code appartiennent aux \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés} avec respectivement $31$ et $16$ commentaires. Cependant, $3$ individus des clusters \textit{Réticents} et \textit{Ne se prononce pas} pensent aussi que leurs hiérarchies ne les encouragent pas. Regardons dans les tableaux ci-dessous, les commentaires donnés par ces individus pour ce code : 
+
+```{r , include=TRUE}
+c.3 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes critique.s.p.ec  ", label = "tab22")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+```{r , include=TRUE}
+c.4 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Ne se prononce pas : commentaires associés aux codes critique.s.p.ec  ", label = "tab23")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+- \textit{Non\_critique.p.ec.ac}
+
+Ce code concerne les commentaires donnés par les individus qui sont dans le critique de la question. Ces individus pensent que leurs sujets ou pratiques de recherche sont plus importants. Nous observons dans la table $4.18$, que pour ce code, $23$ individus ont donné des commentaires dont $9$ appartenant au \textit{cluster\_Pro changement}, $8$ au \textit{cluster\_Nuancés}, $4$ au \textit{cluster\_Réticents} et $2$ au \textit{cluster\_Ne se prononce pas}. Regardons dans les tableaux ci-dessous, quelques commentaires du \textit{cluster\_Pro changement} et \textit{cluster\_Réticents} pour ce code : 
+
+```{r , include=TRUE}
+c.5 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Pro changement : commentaires associés aux codes Non.critique.p.ec  ", label = "tab24")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+```{r , include=TRUE}
+c.6 %>%
+  kable("latex", longtable = TRUE, booktabs = T, caption = "Cluster Réticents : commentaires associés aux codes Non.critique.p.ec  ", label = "tab25")%>%
+  kable_styling(latex_options = c("scale_down", "HOLD_position", "repeat_header"), full_width = TRUE, font_size = 9)
+```
+
+En résumé, pour les commentaires associés à ce groupe de questions \textit{Pratiques individuelles}; les codes les plus significatifs pour le \textit{cluster\_Pro changement} sont : diminution de l'empreinte transport de leurs activités, difficulté à se positionner sur certains déplacements qu'ils trouvent indispensables, ils ne sont pas encouragés par la hiérarchie, déjà dans l'action (le changement climatique est au coeur de leurs stratégies), prise en compte de l'impact de leurs sujets de recherche sur la recherche agronomique.
+
+Pour le \textit{cluster\_Nuancés}, nous avons les mêmes codes que ceux du \textit{cluster\_Pro changement}.
+
+Pour le \textit{cluster\_Réticents}, les codes les plus significatifs sont : diminution de l'empreinte transport de leurs activités, déjà dans l'action (le changement climatique est au coeur de leurs stratégies), difficulté à se positionner sur certains déplacements qu'ils trouvent indispensables.
+
+\section{Focus sur les individus représentatifs des clusters}
+
+Une des manières de caractériser nos $clusters$ obtenus précédemment, est de regarder les commentaires donnés par les individus représentatifs (extrêmes) de chaque $cluster$.
+
+En effet, en ACM - MFA, sur le nuage de points des individus, les points qui sont éloignés du centre de gravité (individus extrêmes) sont ceux qui contribuent le plus à la création d'un axe.
+
+Pour cela, nous considérons les $5$ individus les plus représentatifs de chaque cluster.
+
+- \textbf{Cluster\_Pro changement}
+
+Les cinqs individus les plus représentatifs pour ce cluster portent les identifiants respectifs $301$, $196$, $173$, $311$ et $399$ avec respectivement comme distance par rapport au centre du cluster $4.093$, $4.064$, $4.062$, $4.061$ et $3.988$.
+Nous savons que ce cluster décrit les individus qui sont en acceptation avec les mesures et les actions en réponse à l'urgence climatique. Parmi les $5$ individus les plus représentatifs, $3$ parmi eux ont donné des commentaires. Ces trois individus sont tous de genre \textit{masculin}, de statut \textit{chercheur} avec comme champ principal d'activité la \textit{recherche} et ont une tranche d'âge comprise entre $30-39$ ans, $40-49$ ans et $50-59$ ans. 
+
+Au niveau collectif, nous remarquons qu'un seul individu a donné un commentaire lié au code \textit{Nuances\_contraintes.secteur.bailleur}. En effet, cet individu pense que certaines agences de financement sont plutôt vigilantes sur l'impact des pratiques de recherche sur le changement climatique. voici son commentaire : 
+\begin{center}
+<< \textit{Certaines agences de financement (AFD par exemple) sont très vigilants sur la réduction du nombre de déplacement par avion et exige un bilan carbone du projet.}>>
+\end{center}
+
+Au niveau institutionnel, aucun des $3$ individus n'a donné un commentaire. 
+
+Au niveau individuel, les $3$ individus ont donné des commentaires. Les codes concernés sont au nombre de $9$. Nous allons en citer quelques-uns : la diminution de l'empreinte transport des activités de recherche $(n=2)$, la diminution de l'empreinte énergie des pratiques de recherche $(n=1)$, entreprendre des actions sociétales en réponse à l'urgence climatique $(n=2)$, changement au niveau de la gouvernance $(n=3)$, prise en compte de l'impact de leurs sujets de recherche sur la recherche agronomique $(n=1)$, difficulté à se positionner sur l'importance de certains déplacements $(n=1)$.
+
+- \textbf{cluster\_Nuancés}
+
+Les cinqs individus les plus représentatifs pour ce cluster portent les identifiants respectifs $345$, $57$, $264$, $17$ et $389$ avec respectivement comme distance par rapport au centre du cluster $4.31$, $4.24$, $4.00$, $3.93$ et $3.84$.
+Nous savons que ce cluster décrit les individus qui sont moyennement d'accord avec les mesures et les actions en réponse à l'urgence climatique. Parmi nos $5$ individus les plus représentatifs, $1$ seul a donné des commentaires. Cet individu, portant le numéro $264$ correspondant à l'identifiant $11177701571$ est de genre \textit{masculin} avec une tranche d'âge comprise entre $50-59$ ans; de statut \textit{chercheur} et à pour champ principal d'activité la \textit{recherche}.
+
+Au niveau collectif, cet individu pense que certains déplacements sont importants et nécessaires. Voici son commentaire : 
+\begin{center}
+<< \textit{Mais la concertation reste la clé du succès, et ce n'est pas toujours facile par visio conférence, qui n'est pas comparable à une réunion réelle où toute la relation humaine hors réunion peut également avoir son rôle dans le fonctionnement des projets.}>>
+\end{center}
+
+Au niveau institutionnel, il est favorable à la mise en place  d'un plan de réduction de l'impact environnemental si cela répond à une démarche qualité.
+\begin{center}
+<<\textit{je dirais encourager plutôt qu'inciter, les moyens à mettre en oeuvre n'étant pas les mêmes… }>>
+\end{center}
+
+Au niveau individuel, ces commentaires se catégorisent en $3$ thèmes à savoir : prise en compte des compensations carbone des pratiques de recherche, prise en compte de l'impact des pratiques de recherche sur la recherche agronomique et difficulté à se positionner sur l'importance de certains déplacements.
+
+- \textbf{cluster\_Réticents}
+
+Les cinqs individus les plus représentatifs pour ce cluster portent les identifiants respectifs $99$, $306$, $128$, $343$ et $138$ avec respectivement comme distance par rapport au centre du cluster $6.53$, $6.51$, $6.15$, $6.14$ et $5.81$.
+Nous savons que ce cluster décrit les individus qui sont en désaccord avec les mesures et les actions en réponse à l'urgence climatique. Parmi nos $5$ individus les plus représentatifs, $3$ ont donné des commentaires. Deux d'entre eux sont tous du genre \textit{autre}, de statut \textit{chercheur} avec comme champ principal d'activité la \textit{recherche} et ont une tranche d'âge comprise entre $40-49$ ans et $50-59$ ans. L'autre individu est du genre \textit{masculin} avec une tranche d'âge comprise entre $30-39$ ans.
+
+Au niveau collectif, $2$ parmi les $3$ individus ont donné des commentaires. À savoir les deux individus de genre \textit{autre}. Ils sont contre le changement de leurs pratiques de recherche en réponse à l'urgence climatique. Voici leurs commentaires : 
+\begin{center}
+<< \textit{Même avant, on ne se déplacait pas pour rien.}>> \\
+<< \textit{Question très orientée}>>
+\end{center}
+
+Au niveau institutionnel, seul l'individu portant le numéro $128$ a donné des commentaires. Il est contre le changement des activités de recherche, des émissions de gaz à effet de serre ou des empreintes environnementales en réponse à l'urgence climatique.
+\begin{center}
+<< \textit{Doit-on arrêter de respirer ? pour limiter le taux de CO2 dans les bureaux.}>>
+\end{center}
+
+Au niveau individuel, $2$ parmi les $3$ individus ont donné des commentaires. À savoir les individus portant les numéros $128$ et $138$. Les commentaires donnés se regroupent en $3$ thèmes : critique de la question, contre changement des sujets ou pratiques de recherche en réponse à l'urgence climatique, diminution de l'empreinte transport des pratiques ou activités de recherche.
+
+\section{Analyse conjointe des différents niveaux : collectif, institutionnel et individuel}
+            
+Intéressons-nous maintenant aux codes ( qui apparaissent à la fois dans les trois groupes de questions) afin de mieux caractériser cette dimensionnalité aux niveaux institutionnel, collectif et individuel.
+
+Ces codes sont aux nombres de $6$. Regardons en détails chaque code : 
+
+- \textit{Pro.changement\_empreinte.transport}
+
+Ce code concerne les commentaires donnés par les individus qui proposent des solutions pour diminuer l'empreinte transport des pratiques ou des activités de recherche en général. Grâce aux tables $4.3$, $4.8$ et $4.18$; nous observons qu'au niveau collectif, $53$ commentaires ont été donnés pour ce code contre $17$ commentaires au niveau institutionnel (CIRAD) et $138$ commentaires au niveau individuel. Une différence très significative est à noter entre le niveau institutionnel et les niveaux collectif et individuel. Donc, on peut dire que ce changement suscite beaucoup plus d'intérêt d'un point de vue collectif et individuel qu'institutionnel. De plus, que ça soit au niveau collectif, individuel ou institutionnel; la majeure partie des commentaires donnés proviennent des \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés}. Cela peut s'expliquer par le nombre d'individus appartenant à ces clusters. 
+Du point de vue individuel, tous les individus du \textit{cluster\_Ne se prononce pas} sont favorables pour diminuer l'empreinte transport des pratiques ou activités de recherche.
+Une remarque très importante est à noter au niveau institutionnel. En effet, aucun des individus appartenant au \textit{cluster\_Réticents} n'a donné un commentaire pour ce code. Or, nous savons que ce cluster décrit les individus qui ont tendance à être en désaccord avec les actions et les mesures en réponse à l'urgence climatique. Donc, au niveau institutionnel (CIRAD); aucun des individus du \textit{cluster\_Réticents} ne se positionne quant à la diminution de l'empreinte transport des pratiques ou activités de recherche en réponse à l'urgence climatique.
+
+- \textit{Pro.changement\_empreinte.énergie}
+
+Ce code concerne les commentaires donnés par les individus qui pointent comme limite l'empreinte énergie des activités de recherche en général. Au niveau collectif, $18$ commentaires ont été donnés pour ce code contre $5$ commentaires au niveau institutionnel et $20$ commentaires au niveau individuel. Nous observons toujours que le niveau institutionnel a moins de commentaires. De plus, que ça soit au niveau collectif, individuel ou institutionnel; la majeure partie des commentaires donnés pour ce code proviennent du \textit{cluster\_Pro changement}. Donc, on peut dire que les individus qui sont dans l'acceptation des mesures et des actions en réponses à l'urgence climatique sont plus favorables à la diminution de l'empreinte énergie des activités de recherche.
+Une remarque très importante est à noter au niveau collectif. En effet, aucun des individus appartenant au \textit{cluster\_Réticents} n'a donné un commentaire. D'où, au niveau collectif; aucun des individus du \textit{cluster\_Réticents} ne se positionne pour diminuer l'empreinte énergie des activités de recherche en réponse à l'urgence climatique.
+
+- \textit{Pro.changement\_empreinte.déchets}
+
+Ce code concerne les commentaires donnés par les individus qui proposent de diminuer l'impact des déchets des pratiques de recherche sur le changement climatique (plastiques, déchets chimiques etc .). Pour ce code, au niveau collectif; $10$ commentaires ont été donnés contre $4$ commentaires au niveau institutionnel et $18$ commentaires au niveau individuel. Pour le niveau institutionnel, au moins un individu appartenant à chacun des $4$ $clusters$ a donné un commentaire. Par contre, pour les niveaux collectif et individuel; seul les individus du \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés} sont favorables à la diminution de l'impact des déchets des pratiques de recherche sur le changement climatique. Donc, aucun des individus du \textit{cluster\_Réticents} ne se positionne quant à la diminution de l'impact des déchets des pratiques de recherche sur le changement climatique.
+
+- \textit{Non.encouragement\_gouvernance.tutelles ou Pro.changement\_gouvernance.tutelles}
+
+Ce code concerne les commentaires donnés par les individus qui proposent un changement au niveau de la gouvernance notamment les (appel d’offres, modalités de gouvernance et d’animation, mandats etc.). Aux niveaux collectif et institutionnel, $12$ commentaires ont été donnés contre $53$ commentaires au niveau individuel. Une différence très significative est à noter entre le niveau individuel et les niveaux collectif et institutionnel. Donc ce changement suscite beaucoup plus d'intérêt d'un point de vue individuel que collectif et institutionnel. Nous remarquons toujours que les individus du \textit{cluster\_Pro changement} et du \textit{cluster\_Nuancés} sont ceux qui donnent plus de commentaires que ça soit d'un point de vue collectif, individuel ou institutionnel. Par contre, au niveau institutionnel, un seul individu du \textit{cluster\_Réticents} propose un changement au niveau de la gouvernance.
+
+- \textit{Contre.changement\_critique}
+
+Ce code concerne les commentaires donnés par les individus qui sont contre le changement de leurs empreintes environnementales, leurs activités ou pratiques de recherche ou de leurs émissions de gaz à effet de serre. Ces individus sont dans le critique notamment sur la formulation de la question. Au niveau collectif, $8$ commentaires ont été donnés pour ce code contre $7$ commentaires au niveau institutionnel et $23$ commentaires au niveau individuel.
+Une remarque très importante est à noter aux niveaux collectif et institutionnel. En effet, au niveau collectif, la majeure partie des individus qui ont donné un commentaire pour ce code proviennent du \textit{cluster\_Réticents}. Par contre, au niveau institutionnel, nous observons dans la table $4.8$, que le nombre de commentaires donnés est équitable entre les $4$ $clusters$.  
+Donc au niveau collectif, les individus qui sont contre le changement sont ceux qui étaient déjà en désaccord avec les mesures et les actions en réponses à l'urgence climatique tandisqu'au niveau institutionnel, les individus qui sont contre le changement appartiennent tanttôt à ceux qui étaient en désaccord ou d'accord avec les mesures et les actions en réponses à l'urgence climatique. Cependant, au niveau individuel, la majeure partie des commentaires donnés pour ce code proviennent des \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés}.
+
+- \textit{Nuances.déplacements}
+
+Ce code concerne les commentaires donnés par les individus qui ont une dificulté à se positionner notamment sur certains déplacements qu'ils trouvent nécessaires et importants pour l'avancée de la recherche. Ainsi, $20$ commentaires ont été donnés pour ce code au niveau collectif contre $12$ commentaires au niveau institutionnel et $69$ commentaires au niveau individuel. Nous constatons toujours cette difference signficative de commentaires apportés pour le niveau individuel. 
+Toujours grâce aux tables $4.3$, $4.8$ et $4.18$, nous observons que ça soit au niveau collectif, institutionnel ou individuel; la majeure partie des individus ayant donné un commentaire pour ce code proviennent des \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés}.
+
+
+\section{Conclusion}
+
+Grâce à ces méthodes d'analyse qualitative et de fouille de textes, nous avons pu approfondir l'interprétation des résultats de l'analyse quantitative des questions fermées et mieux comprendre les déterminants des catégories de points de vue (collectif, institutionnel et individuel).
+
+Une analyse fréquentielle des suggestions ou commentaires en lien avec les actions possibles pour réduire l'empreinte environnementale du CIRAD nous a permis d'observer que la priorisation du télétravail est l'action la plus recommandée afin de réduire l'empreinte environnementale du CIRAD.
+
+Différentes idées émergent de l'analyse de contenu des commentaires recueillis par groupes de questions.
+
+Au niveau collectif, $13$ thèmes ou (codes) ressortent de cette analyse. En comptabilisant pour chaque code, le nombre de commentaires donnés par un individu en fonction des $clusters$, nous avons identifié les thèmes les plus fréquents de chaque $cluster$ :
+
+Pour le \textit{cluster\_Pro changement}, les diminutions de l'empreinte transport ($n=24$) et énergie ($n=11$) des pratiques d'activités et une difficulté à se positionner sur l'importance de certains déplacements ($n=10$) (nécessaires et utiles pour l'avancée de la recherche) sont les thèmes les plus fréquents.
+
+Pour le \textit{cluster\_Nuancés}, les diminutions de l'empreinte transport ($n=24$), énergie ($n=7$) et déchet ($n=5$) des pratiques d'activités et une difficulté à se positionner sur l'importance de certains déplacements ($n=5$) (nécessaires et utiles pour l'avancée de la recherche) sont les thèmes les plus fréquents.
+
+Pour le \textit{cluster\_Réticents}, la diminution de l'empreinte transport des pratiques d'activités ($n=4$), une difficulté à se positionner sur l'importance de certains déplacements ($n=4$) (nécessaires et utiles pour l'avancée de la recherche) et contre changement des pratiques d'activités ($n=5$) sont les thèmes les plus fréquents.
+
+En considérant toujours le niveau collectif, parmi les $5$ individus les plus représentatifs (extrêmes) des clusters, nous avons que :
+\begin{itemize}
+  \item Pour le \textit{cluster\_Pro changement}, seul l'individu $399$ de genre \textit{masculin} avec une tranche d'âge comprise entre $40-49$, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche} a donné un commentaire qui parle de la vigilance de certaines agences de financement sur l'impact des pratiques de recherche sur le changement climatique.
+  \item Pour le \textit{cluster\_Nuancés}, seul l'individu $264$ de genre \textit{masculin} avec une tranche d'âge comprise entre $50-59$, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche} a donné un commentaire qui parle de l'importance de certains déplacements qu'il trouve nécessaire pour l'avancer de la recherche.
+  \item Pour le \textit{cluster\_Réticents}, $2$ individus ont donné des commentaires. L'individu $99$ de genre \textit{autre} avec une tranche d'âge comprise entre $40-49$ ans, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche}; l'individu $128$ de genre \textit{autre} avec une tranche d'âge comprise entre $50-59$ ans, de statut \textit{chercheur} et comme champ d'activité principal la \textit{recherche}. En effet, ils sont contre le changement des pratiques de recherche en réponse à l'urgence climatique.  
+\end{itemize}
+
+Au niveau institutionnel (principalement du Cirad), $15$ thèmes ou (codes) ressortent de cette analyse. En comptabilisant pour chaque code, le nombre de commentaires donnés par un individu en fonction des $clusters$, nous avons identifié les thèmes les plus fréquents de chaque $cluster$ :
+
+Pour le \textit{cluster\_Pro changement}, exemplarité et cohérance au travail ($n=13$), critique du CIRAD notamment sur leurs empreintes environnementales ($n=17$), diminution de l'empreinte transport des activités de recherche ($n=7$) et changement au niveau de la gouvernance ($n=7$) sont les thèmes les plus fréquents.
+
+Pour le \textit{cluster\_Nuancés}, exemplarité et cohérance au travail ($n=20$), critique du Cirad notamment sur leurs empreintes environnementales ($n=9$) et diminution de l'empreinte transport des activités de recherche ($n=10$) sont les thèmes les plus fréquents.
+
+Pour le \textit{cluster\_Réticents}, critique du Cirad notamment sur leurs empreintes environnementales ($n=4$) et nuance gouvernance ($n=3$) sont les thèmes les plus fréquents.
+
+En considérant toujours le niveau institutionnel, parmi les $5$ individus les plus représentatifs (extrêmes) des clusters, nous avons que :
+\begin{itemize}
+\item Pour le \textit{cluster\_Pro changement}, aucun des individus extrêmes n'a donné un commentaire lié aux différents thèmes obténus en réponse à l'urgence climatique.
+
+\item Pour le \textit{cluster\_Nuancés}, seul l'individu $264$ de genre \textit{masculin} avec une tranche d'âge comprise entre $50-59$, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche} a donné un commentaire qui parle de la mise en place d'un plan de réduction de l'impact environnemantal.
+
+\item Pour le \textit{cluster\_Réticents}, seul l'individu $128$ de genre \textit{autre} avec une tranche d'âge comprise entre $50-59$ ans, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche} a donné un commentaire. En effet, il est contre le changement des activités de recherche, des empreintes environnementales ou des émissions de gaz à effet de serre en réponse à l'urgence climatique.  
+\end{itemize}
+
+Au niveau individuel, $23$ thèmes ou (codes) ressortent de cette analyse. En comptabilisant pour chaque code, le nombre de commentaires donnés par un individu en fonction des $clusters$, nous avons identifié les thèmes les plus fréquents de chaque $cluster$ :
+
+Pour le \textit{cluster\_Pro changement}, diminution de l'empreinte transport des activités de recherche ($n=73$), difficulté à se positionner sur certains déplacements qu'ils trouvent indispensables ($n=34$), pointent du doigt les décisions prises par la hiérarchie ($n=31$), déjà dans l'action ($n=28$) (le changement climatique est au coeur de leurs stratégies) et prise en compte de l'impact de leurs sujets de recherche sur la recherche agronomique ($n=22$) sont les thèmes les plus fréquents.
+
+Pour le \textit{cluster\_Nuancés}, nous avons les mêmes propositions que pour le \textit{cluster\_Pro changement}.
+
+Pour le \textit{cluster\_Réticents}, diminution de l'empreinte transport des activités de recherche ($n=8$), déjà dans l'action ($n=6$) (le changement climatique est au coeur de leurs stratégies), difficulté à se positionner sur certains déplacements qu'ils trouvent indispensables ($n=5$) et contre changement des pratiques d'activités ($n=4$) sont les thèmes les plus fréquents.
+
+En considérant toujours le niveau individuel, parmi les $5$ individus les plus représentatifs (extrêmes) des clusters, nous avons que :
+\begin{itemize}
+\item Pour le \textit{cluster\_Pro changement}, les individus $399$, $196$ et $173$ de genre \textit{masculin} avec une tranche d'âge comprise entre $30-59$ ans, de statut \textit{chercheur} et ayant comme champ principal d'activité la \textit{recherche} ont donné des commentaires qui se regroupent en $9$ thèmes. Nous allons en citer quelques-uns : diminution de l'empreinte transport des activités de recherche, diminution de l'empreinte énergie des pratiques de recherche, entréprendre des actions sociétales en réponse à l'urgence climatique, changement au niveau de la gouvernance, prise en compte de l'impact des sujets de recherche sur la recherche agronomique, difficulté à se positionner sur l'importance de certains déplacements.
+
+\item Pour le \textit{cluster\_Nuancés}, seul l'individu $264$ de genre \textit{masculin} avec une tranche d'âge comprise entre $50-59$, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche} a donné des commentaires qui se regroupent en $3$ thèmes. Ces thèmes concernent la prise en compte des compensations carbone des pratiques de recherche, la prise en compte de l'impact des pratiques de recherche sur la recherche agronomique et une difficulté à se positionner sur l'importance de certains déplacements.
+
+\item Pour le \textit{cluster\_Réticents}, les individus $128$ et $138$ de genre respectivement \textit{autre} et \textit{masculin}, de statut \textit{chercheur} et ayant comme champ d'activité principal la \textit{recherche} ont donné des commentaires qui concernent la diminution de l'empreinte transport des pratiques ou activités de recherche, et contre changement des sujets ou pratiques de recherche en réponse à l'urgence climatique.  
+\end{itemize}
+
+De plus, l'analyse conjointe des différents niveaux nous a permis d'observer :
+
+Une différence marquée entre les points de vue des acteurs d'une part au niveau individuel et d'autre part aux niveaux collectif et institutionnel. En effet, les individus ont tendance à donner leurs points de vues pour les questions du groupe pratiques individuelles. 
+
+Nous avons remarqué aussi que ça soit au niveau collectif, institutionnel ou individuel; la majeure partie des commentaires donnés pour les $6$ thèmes ou codes proviennent des \textit{cluster\_Pro changement} et \textit{cluster\_Nuancés} sauf pour un seul code à savoir \textit{Contre.changement\_critique}.
+
+En effet, pour ce code; au niveau collectif, la majeure partie des commentaires donnés proviennent du \textit{cluster\_Réticents} par contre au niveau institutionnel, le nombre de commentaires donnés est équitable entre les $4$ clusters.
+
+Donc pour le code \textit{Contre.changement\_critique}, au niveau collectif, les individus qui sont contre le changement sont ceux qui étaient déjà en désaccord avec les mesures et les actions en réponse à l'urgence climatique. Par contre au niveau institutionnel, le nombre de commentaires donnés est équitable entre les $4$ clusters. A ce niveau, les individus qui sont contre le changement appartiennent tantôt à ceux qui étaient en désaccord, tantôt à ceux qui étaient d'accord avec les mesures et les actions en réponse à l'urgence climatique.
+
+De plus, pour le \textit{cluster\_Réticents} : 
+
+Au niveau institutionnel, aucun des individus ne se positionne quant à la diminution de l'empreinte transport et l'impact des déchets des pratiques d'activités ou activités de recherche en réponse à l'urgence climatique.
+
+Au niveau collectif, aucun des individus ne se positionne pour diminuer l'empreinte énergie des activités de recherche en réponse à l'urgence climatique.
+
+
+\section*{Conclusion générale}
+\addcontentsline{toc}{section}{Conclusion générale}
+
+Pour résumer, l'analyse des questions fermées, propices à des méthodologies d'analyses quantitatives et l'analyse des questions ouvertes sous forme de commentaires libres, propices à des méthodologies d'analyses qualitatives nous ont permis de caractériser la diversité des pratiques et des points de vue des individus ayant répondu à l'enquête.
+
+Ces méthodologies d'analyses quantitatives et qualitatives nous ont permis d'une part d'aboutir à une typologie avec la mise en évidence des profils types et d'autre part d'identifier différentes catégories de points de vue comme les propositions de changements et les freins au changement en réponse à l'urgence climatique.
+
+$4$ clusters ressortent de l'analyse : 
+
+- \textbf{Cluster\_Pro changement}
+
+Il comprend $173$ individus qui ont la particularité d'être dans l'acceptation des mesures et des actions en réponse à l'urgence climatique. Cette acceptation est liée à des questions appartenant aux avis sur les pratiques collectives et sur les pratiques institutionnelles (CIRAD). Par contre, pour des questions liées aux avis sur les pratiques individuelles; les réponses apportées par les individus de ce cluster sont mitigées.
+
+L'analyse des questions socio-démographiques nous a permis de voir qu'aucun des facteurs socio-démographiques n'est susceptible d'influencer la réponse donnée par un individu de ce cluster.
+
+L'analyse des questions liées à la mobilité de nos différents groupes nous a permis de voir : 
+
+Concernant les avis sur les pratiques collectives, les individus du \textit{cluster\_Pro changement} sont favorables à un changement afin de réduire l'effet de la mobilité en réponse à l'urgence climatique.
+
+Concernant les avis sur les pratiques institutionnelles (CIRAD), les individus du \textit{cluster\_Pro changement} recommandent la mise en place des actions afin de réduire l'empreinte environnementale du CIRAD sauf pour $3$ actions où les avis sont partagés à savoir : 
+\begin{center}
+ << \textit{Compensation des émissions de gaz à effet de serre pour les déplacements en avion. }>> \\
+  
+ << \textit{Prise en compte de l’impact environnemental des déplacements dans la gestion de la mobilité géographique (expatriation versus mission).}>> \\
+  
+ << \textit{Changements dans les critères d’évaluation de carrière (Ex : moins de poids au nombre de conférences et de séminaires invités, nombre de réunions à haut niveau; plus de poids aux efforts de réduction des impacts environnementaux de nos activités)}>>
+\end{center}
+
+Suite à l'analyse de contenu des commentaires recueillis par groupes de questions, différentes idées, thèmes ou codes ont émergé. Pour le \textit{cluster\_Pro changement}, nous avons :
+
+Les diminutions de l'empreinte transport ($n=24$ commentaires) et énergie ($n=11$) des pratiques d'activités et une difficulté à se positionner sur l'importance de certains déplacements nécessaires et utiles pour l'avancée de la recherche ($n=10$) sont les thèmes les plus fréquents au niveau collectif. Voici quelques commentaires :
+
+\begin{center}
+ << \textit{Les déplacements internationaux sont une charge lourde de notre activité pour l'impact climatique.  Les déplacements locaux pourraient grandement progresser : Le TELETRAVAIL est à mettre en place d'urgence !  A MPL le site de Baillarguet nécessite un rapprochement écologique de celui de Lavalette : pistes cyclables et vélo électriques + voiturettes électriques en libre accès. Il faudrait investir et obtenir des soutiens de la collectivité.}>>
+\end{center}
+\begin{center}
+  << \textit{ Limitations de nos ressources énergétiques (stockage numérique (serveurs), envois de de courriels, …).}>>
+\end{center}
+\begin{center}
+  << \textit{Même si je suis d'accord sur le fait qu'il va falloir changer la pratique de nos métiers, je dois aussi me rendre à l'évidence qu'aucune visio ne remplace une rencontre physique entre les personnes et le relationnel qui peut se créer entre des partenaires de projet autour d'une visite terrain ou d'un dîner. On monte bien mieux un projet lorsqu'on est face à face qu'à distance. Cela voudrait dire moins de partenariats pluri-pays par exemple? les implications sont nombreuses et la réponse pas si simple…}>>
+\end{center}
+
+
+Exemplarité et cohérance au travail ($n=20$), critique du CIRAD  notamment sur leurs empreintes environnementales ($n=9$) et diminution de l'empreinte transport des activités de recherche ($n=10$) sont les thèmes les plus fréquents au niveau institutionnel. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{Cf. un de mes commentaires plus haut.  Le CIRAD doit s'afficher fortement, comme pour le GenderSmart. C'est d'autant plus pertinent pour un institut comme le CIRAD. Le CIRAD devrait avoir un budget annuel pour cela, dépensé en reboisant la France! ou les pays du Sud.}>>
+\end{center}
+\begin{center}
+  << \textit{On doit être exemplaire avant de donner des leçons aux autres…} >>
+\end{center}
+\begin{center}
+  << \textit{Avec des propositions de mesures concrètes:     déplacements en vélo ou en bus pris en compte, TÉLÉTRAVAIL, regroupement de missions, quotas d'avions par agent (il y en a qui exagèrent vraiment), quotas de billet congés modulé par le type de déplacement.}>>
+\end{center}
+
+Diminution de l'empreinte transport des activités de recherche ($n=73$), difficulté à se positionner sur certains déplacements qu'ils trouvent indispensables ($n=34$), changement au niveau de la gouvernance ($n=31$), déjà dans l'action (le changement climatique est au coeur de leurs stratégies) ($n=28$) et prise en compte de l'impact de leurs sujets de recherche sur la recherche agronomique ($n=22$) sont les thèmes les plus fréquents au niveau individuel. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{J'essaie de limiter les déplacements longue distance en avion lorsqu'ils ne sont pas nécessaires. Je ne me rends au travail qu'à vélo. Pour mes déplacements en France, je ne prends jamais l'avion, que ce soit pour le travail ou les déplacements personnels. }>>
+\end{center}
+\begin{center}
+ << \textit{Difficile de juger quels déplacements sont réellement indispensables... On peut dire par exemple qu'aller donner une formation ou aller sur le terrain est indispensable mais aller à une conférence non. En même temps certaines conférences amènent à de nouveaux projets, de nouveaux financements et il est difficile d'en préjuger avant d'y aller.}>>
+\end{center}
+\begin{center}
+  << \textit{L'impression de me battre contre des moulin à vent face à la direction qui soutient un modèle économique pour l'entreprise auquel je n'adhère pas. Le refus systématique du télétravail pourtant adopté par la fonction publique et un grand nombre d'entreprises privées en France est très décourageant par exemple.}>>
+\end{center}
+\begin{center}
+  << \textit{Meilleur prise en compte de la place du stress hydrique dans les recherches agronomiques (en lien avec potentiel futures sécheresses).}>>
+\end{center}
+
+Une analyse des individus les plus représentatifs (contributifs) du cluster c'est-à-dire les individus extrêmes du \textit{cluster\_Pro changement} nous a permis de voir que parmi les $5$ individus les plus représentatifs du \textit{cluster\_Pro changement} : 
+
+Au niveau collectif, un seul individu de genre \textit{masculin} avec une tranche d'âge comprise entre $40-49$, de statut \textit{chercheur} et ayant comme champ d'activité la \textit{recherche} a donné un commentaire qui parle de la vigilance de certaines agences de finacement sur l'inpact des pratiques de recherche sur le changement climatique.
+
+Au niveau institutionnel, aucun des individus n'a donné un commentaire.
+
+Au niveau individuel, $3$ individus ont donné des commentaires. Ces commentaires se regroupent en $9$ thèmes. Nous allons en citer quelques-uns : la diminution de l'empreinte transport des activités de recherche ($n=2$), la diminution de l'empreinte énergie des pratiques de recherche ($n=1$), entreprendre des actions sociétales en réponse à l'urgence climatique ($n=2$), changement au niveau de la gouvernace ($n=3$), etc.
+
+L'analyse conjointe des différents niveaux c'est-à-dire l'analyse des $6$ thèmes qui apparaissent à la fois aux niveaux collectif, institutionnel et individuel nous a permis d'observer :
+
+La majeure partie des commentaires donnés par les individus pour les propositions de changement au niveau des transport; de l'empreinte énergie; de la gestion des déchets et de la gouvernance  proviennent des clusters \textit{pro changement} et \textit{nuancés}.
+
+La majeure partie des commentaires donnés par les individus concernant les avis nuancés sur les déplacements proviennent des clusters \textit{pro changement} et \textit{nuancés}
+
+- \textbf{Cluster\_Nuancés}
+
+Il comprend $160$ individus qui ont la particularité d'être moyennement d'accord avec les mesures et les actions en réponse à l'urgence climatique. Cette nuance est liée à des questions appartenant aux avis sur les pratiques collectives et sur les pratiques institutionnelles (CIRAD). Par contre, pour des questions liées aux avis sur les pratiques individuelles; les réponses apportées par les individus de ce cluster sont mitigées.
+
+L'analyse des questions socio-démographiques nous a permis de voir qu'aucun des facteurs socio-démographiques n'est susceptible d'influencer la réponse donnée par un individu de ce cluster.
+
+Concernant l'analyse des questions liées à la mobilité, nous avons les mêmes avis que ceux du profil \textit{pro changement}.
+
+Suite à l'analyse de contenu des commentaires recueillis par groupes de questions, différentes idées, thèmes ou codes ont émergé. Pour le \textit{cluster\_nuancés}, nous avons : 
+
+Diminution de l'empreinte transport ($n=24$), énergie ($n=7$) et déchet ($n=5$) des pratiques d'activités et une difficulté à se positionner sur l'importance de certains déplacements ($n=5$) sont les thèmes les plus fréquents au niveau collectif. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{Il faut lutter à contre courant pour parvenir à éviter des déplacements que l'on peut remplacer par des séances de travail à distance (c'est sûr avec un effort d'adaptation de la méthodologie et des outils de travail). Cette résistance aux déplacements intempestifs sur le motif de la réduction de l'empreinte carbone est parfois reçue perçue comme une fausse excuse ou alors comme une réaction démesurée, un seul déplacement paraissant comme une goutte d'eau dans l’océan.}>>
+\end{center}
+\begin{center}
+  << \textit{Voir comment réduire réduction des échanges par mail non utiles + limiter archivages sauf courriers majeurs (libération espaces sur serveurs).   Arrêter de faire des manips systématiques et le stockage d'échantillons congelés (au cas où?), mieux dimensionner le nombre d'échantillons à traiter pour les essais  - réfléchir à des sources d'énergie alternatives pour chauffage refroidissement (labos, serres, bureaux,…).}>> 
+\end{center}
+\begin{center}
+  << \textit{Il me semble que l'impact de nos pratiques sont plutôt sur les aspects déchets, notamment les plastiques à usage unique et les produits bien toxiques que nous utilisons}.>>
+\end{center}
+
+Exemplarité et cohérance au travail ($n=20$), critique du Cirad notamment sur leurs empreintes environnementales ($n=9$) et diminution de l'empreinte transport des activités de recherche ($n=10$) sont les thèmes les plus fréquents au niveau institutionnel. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{De part sa dimension internationale, le Cirad se doit d'être moteur dans ce domaine, qui est aussi un de ses sujet de recherche, et pour lequel il dispose d'outils de mesure, et doivent montrer l'exemple !}>>
+\end{center}
+\begin{center}
+  
+  << \textit{C’est un objectif qui existe EN DEHORS DE TOUT CONTEXTE d’URGENCE et qui surtout NE CONSISTE EN RIEN à une réponse à l’urgence, objet(?) de ce questionnaire. Nous vivons probablement les conséquences d’avoir totalement méprisé toutes les ressources planétaires et les générations à venir, mais échapper à l’effondrement qui s’approche requiert infiniment plus qu’à adopter une attitude essayant d’être « un peu plus respectueuse de l’environnement » ! C’est ce qui AURAIT PERMIS de ne jamais être confronté à cette situation, mais il ne suffit plus de dire «il faut moins jouer avec les allumettes » pour éteindre l’incendie que cela a provoqué ! Oser dire ce genre de choses est grave !  NOUS SOMMES DES SCIENTIFIQUES, et avons de ce fait à la fois de part nos connaissances une responsabilité accrue vis à vis du reste de l’humanité et l’obligation morale de l’avertir de nos découvertes en particulier si celles-ci menacent sa pérennité. C’est ce que le monde scientifique fait… mais PAS LE CIRAD : il a comme les autres institutions scientifiques la possibilité et le devoir d’informer, d’alerter, de se positionner et de préconiser les décisions urgentes à prendre. Il ne s’agit même pas d’exemplarité, mais de devoir ! A lire les différentes déclarations et actus publiées… il ne le fait même pas. Quand de plus, les instances décisionnaires ne prennent à l’évidence pas les décisions requises et indispensables, (si les pompiers refusent d’intervenir sur l’incendie), il devient le devoir des scientifiques - car ils sont les plus à même de l’apprécier objectivement – d’en informer aussi le reste du monde car cette attitude de déni CONSTITUE EN ELLE MÊME un danger pour l’humanité et un REFUS de lui venir en aide. C’est également ce que font les autres scientifiques et qu’on attendrait aussi du CIRAD… ne serait que la nécessité absolue de déclarer un ETAT d’URGENCE climatique mondial… et d’agir en conséquence. Ce devrait être UNE des « exemplarités » du CIRAD.}>>
+\end{center}
+
+Au niveau individuel, nous avons les mêmes thèmes que pour le \textit{cluster\_Pro changement}.
+
+Une analyse des individus les plus représentatifs (contributifs) du cluster c'est-à-dire les individus extrêmes du \textit{cluster\_Nuancés} nous a permis de voir que parmi les $5$ individus les plus représentatifs du \textit{cluster\_Nuancés} : 
+
+Au niveau collectif, institutionnel ou individuel ; un seul individu de genre \textit{masculin} avec une tranche d'âge comprise entre $50-59$ ans, de statut \textit{chercheur} et ayant comme champ d'activité la \textit{recherche} a donné des commentaires. Ces commentaires concernent l'importance de certains déplacements qu'il trouve nécessaires pour l'avancée de la recherche, la mise en place d'un plan de réduction de l'impact environnemental, la prise en compte des compensations carbone des pratiques de recherche et la prise en compte de l'impact des pratiques de recherche sur la recherche agronomique.
+
+- \textbf{Cluster\_Réticents}
+
+Il comprend $26$ individus qui ont la particularité d'être en désaccord avec les mesures et les actions en réponse à l'urgence climatique. Ce désaccord est lié à des questions appartenant aux avis sur les pratiques collectives et sur les pratiques institutionnelles (CIRAD). Par contre, pour des questions liées aux avis sur les pratiques individuelles, les réponses apportées par les individus de ce cluster sont mitigées.
+
+L'analyse des questions socio-démographiques nous a permis de voir que la majeure partie des individus qui composent ce cluster sont des \textit{chercheurs}, de genre \textit{masculin - autre} avec comme champ d'activité la \textit{recherche} et l'\textit{appui}.
+
+L'analyse des questions liées à la mobilité de nos différents groupes nous a permis de voir :
+
+Concernant les avis sur les pratiques collectives, les individus de ce cluster \textit{réticents} pensent que la mobilité a un effet moindre sur le changement climatique, pas la prioté.
+
+Concernant les avis sur les pratiques institutionnelles, les réponses apportées par les individus de ce cluster \textit{réticents} pour la mise en place des actions afin de réduire l'empreinte environnementale du CIRAD sont partagées sauf pour deux actions : 
+
+\begin{center}
+  \textbf{Défavorables} : \textit{changements dans les critères d'évaluations de carrière (Ex: moins de poids au nombre de conférences et de séminaires invités, nombre de réunions à haut niveau; plus de poids aux efforts de réduction des impacts environnementaux de nos activités)}
+\end{center}
+\begin{center}
+  \textbf{Favorables} : \textit{Mise en place par le CIRAD de mesures incitatives pour utiliser des modes de déplacement domicile-travail sobres en carbone}
+\end{center}
+
+Suite à l'analyse de contenu des commentaires recueillis par groupes de questions, différentes idées, thèmes ou codes ont émergé. Pour le \textit{cluster\_Réticents}, nous avons :
+
+Diminution de l'empreinte transport des pratiques d'activités ($n=4$), une difficulté à se positionner sur l'importance de certains déplacements ($n=4$) et contre changement des pratiques d'activités ($n=5$) sont les thèmes les plus fréquents au niveau collectif. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{une recherche réellement collaborative nécessite MOINS de déplacements physiques.   Déplacements inutiles parce que le ou la chercheur.e qui se déplace souvent et loin ... le veut bien.}>> 
+\end{center}
+\begin{center}
+  << \textit{Par ailleurs, meme si on emploie la visio autant que possible, un certain nombre de nos partenaires et pays sont encore mal réseautés et ca ne fonctionne pas de manière satisfaisante, sans compter qu'il faut aussi prendre en compte le coût energetique des data centers et autres méthodes alternatives. Certaines étapes necessitent malgré tout un échange réel humain entre personnes, et des déplacements sur le terrain}>>
+\begin{center}
+\end{center}
+  << \textit{Nos voyages au moins sont utiles pour la planète puisque nous travaillons tous pour le même objectif (agriculture, adaptation, changement climatique, sociétés, etc). En tous cas plus utiles que les centaines de milliers de touristes ou retraités qui vont en Nouvelle Zelande juste pour une semaine ou en Antartique à déranger les balènes.}>> 
+\end{center}
+
+Critique du CIRAD notamment sur leurs empreintes environnementales ($n=4$) et nuance gouvernance ($n=3$) sont les thèmes les plus fréquents au niveau institutionnel. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{Enfin ! Soyons TOUS responsables et arrêtons de nous comporter comme des enfants qui attendent la parole divine.}>>
+\end{center}
+\begin{center}
+  << \textit{Je n'aime pas du tout la notion de hiérarchie comme si les leaders étaient dans leur sagesse déjà dans le combat pour l'urgence climatique. Ma proposition contradictoire serait la suivante: "Par son exemplarité comportementale la direction notre hiérarchie incite directement chacun.e d’entre nous à la réduction des émissions de gaz à effet de serre.}>> 
+\end{center}
+
+Diminution de l'empreinte transport des activités de recherche ($n=8$), déjà dans l'action (le changement climatique est au coeur de leurs stratégies) ($n=6$), difficulté à se positionner sur certains déplacements qu'ils trouvent indispensables ($n=5$) et contre changement des pratiques d'activités ($n=4$) sont les thèmes les plus fréquents au niveau individuel. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{Mon métier est déjà $100\%$ connecté au changement climatique, ce qui me manque ce sont des financements.}>>
+\end{center}
+\begin{center}
+  << \textit{Non, ici ca n'est juste pas possible, dans les DOM et au Sénégal les moyens de transport publics ne sont pas à la hauteur des enjeux et ne me permettent pas de changer de moyen de mobilité. Je ne pense pas que nous ayons encore les moyens et le temps de faire des voyages inutiles a priori. Après qu'appelle t on un voyage inutile/non indispensable ? une formation est-elle inutile ? une mission de prospection/construction de projet qui peut-etre n'aboutira pas est-elle inutile si au final le projet n'est pas retenu ? un DU ou un Directeur de département qui vient voir ses agents sur le terrain pour mieux comprendre le contexte, les conditions de travail, etc fait-il un voyage inutile ? au final c'est quoi un voyage inutile.}>>
+\end{center}
+\begin{center}
+  << \textit{Et j'ai pas que ça à faire!.}>> 
+\end{center}
+
+Une analyse des individus les plus représentatifs (contributifs) du cluster c'est-à-dire les individus extrêmes du \textit{cluster\_Réticents} nous a permis de voir que parmi les $5$ individus les plus représentatifs du \textit{cluster\_Réticents} : 
+
+Aux niveaux collectif et institutionnel; $2$ individus ont donné des commentaires. Ces deux individus sont de genre \textit{autre}, de statut \textit{chercheur} et ont comme champ d'activité la \textit{recherche} avec une tranche d'âge comprise entre $40-49$ ans et $50-59$ ans. Ils sont contre le changement des pratiques de recherche ou des empreintes environnementales ou des émissions de gaz à effet de serre en réponse à l'urgence climatique.
+
+Au niveau individuel, $2$ individus ont donné des commentaires. Ces commentaires concernent la diminution de l'empreinte transport des pratiques ou activités de recherche et contre changement des sujets ou pratiques de recherche en réponse à l'urgence climatique.
+
+L'analyse conjointe des différents niveaux c'est-à-dire l'analyse des $6$ thèmes qui apparaissent à la fois aux niveaux collectif, institutionnel et individuel nous a permis d'observer :
+
+Aucun des individus du \textit{cluster\_Réticents} ne se positionne quant à la diminution de l'empreinte transport et l'impact des déchets des pratiques d'activités en réponse à l'urgence climatique d'un point de vue institutionnel.
+
+Aucun des individus du \textit{cluster\_Réticents} ne se positionne pour diminuer l'empreinte énergie des activités de recherche en réponse à l'urgence climatique d'un point de vue collectif.
+
+- \textbf{Cluster\_Ne se prononce pas}
+
+Il contient seulement $5$ individus qui ont tendance à ne pas se prononcer sur les questions liées aux avis sur les pratiques collectives et sur les pratiques institutionnelles. Par contre, pour des questions liées aux avis sur les pratiques individuelles; les réponses apportées par les individus de ce cluster sont mitigées.
+
+L'analyse des questions socio-démographiques nous a permis de voir que parmi les $5$ individus de ce cluster, $3$ ont une tranche d'âge supérieure à $60$, $4$ individus sont de genre \textit{masculin}, de statut \textit{chercheur} et ont pour champ d'activité la \textit{recherche}.
+
+Suite à l'analyse de contenu des commentaires recueillis par groupe de questions, différentes idées, thèmes ou codes ont émergé. Pour le \textit{cluster\_Ne se prononce pas}, on a :
+
+Diminution de l'empreinte transport des pratiques de recherche ($n=1$), changement au niveau de la gouvernance ($n=1$), difficulté à se positionner sur l'importance de certains déplacements ($n=1$) et nuance sur les secteurs d'activités ou les bailleurs sont les thèmes les plus fréquents au niveau collectif. Voici quelques commentaires : 
+
+\begin{center}
+  << \textit{Trop de réunions intermédiaires ou de démarrage pour montrer que l'on avance.}>>
+\end{center}
+\begin{center}
+  << \textit{difficile de répondre à cette question : par DEFINITION même, une situation d’urgence requiert un comportement exceptionnel et hors norme adapté à cette urgence et donc OUI, mais oui pour n’importe quelle profession ! Si le sous entendu de cette question est (comme cela semble être le cas) « la réponse à l’urgence climatique CONSISTE à adapter notre pratique de la recherche et à la modifier », je réponds NON, car ce n’est en aucun cas une REPONSE à l’urgence, tout au plus un comportement sain qui devra être celui là APRES avoir réussi à la résoudre.}>> 
+\end{center}
+
+Exemplarité et cohérence au travail ($n=2$) et contre changement des activités de recherche ($n=2$) sont les thèmes les plus fréquents au niveau institutionnel. Voici quelques commentaires :
+
+\begin{center}
+  << \textit{No comment: HORS SUJET!}>>
+\end{center}
+\begin{center}
+  << \textit{Oui… à l’exemplarité, mais elle consiste infiniment plus qu’à seulement réduire son empreinte environnemental ! Comme j’aurai l’occasion de le dire ailleurs, il faut savoir de quoi on parle ! La diminution de l’impact environnemental des activités humaines est un objectif évident et normal en relation directe avec la notion même de vie sociale et d’économie (le véritable sens de ce mot, non sa dérive financière).}>>
+\end{center}
+
+Diminution de l'empreinte transport des pratiques de recherche ($n=5$) est le thème le plus fréquent au niveau individuel.
+
+D'où, du point de vue individuel, tous les individus du \textit{cluster\_Ne se prononce pas} sont favorables pour diminuer l'empreinte transport des pratiques ou activités de recherche en réponse à l'urgence climatique.
+
+
+
+Pour finir, nous remarquons que la majorité des individus ayant répondu à l'enquête sont favorables à une transformation des pratiques de recherche. 
+Ceci est en accord avec les résultats de l'enquête nationale faite par le \textit{Labo 1p5} dont nous observons sur la figure ci-dessous que $47\%$ des enquêtés sont tout à fait d'accord que l'urgence climatique exige des changements profonds dans la pratique de nos métiers sur $6342$ enquêtés.
+
+```{r, include=TRUE, echo=FALSE, fig.cap="Résultats Labo 1p5", fig.height=5, out.width = '100%', fig.align='center', fig.pos="H"}
+knitr::include_graphics("labo.png")
+```
+
+
+
+
+
+
+
+\newpage
+\appendix
+\setcounter{page}{0}
+\chapter{Annexes}
+\appendix\section{Listes des questions}\label{annexe1}
+
+- $Q1.1.new$ : L’urgence climatique va exiger des changements profonds dans la pratique de nos métiers de recherche.
+
+- $Q1.2.new$ : L’organisation, l’évaluation et le financement de la recherche (nationale, européenne, internationale) poussent à des déplacements trop nombreux et inutiles.
+
+- $Q2.1.new$ : J'ai fait évoluer mes sujets de recherche en réponse aux alertes sur le changement climatique.
+
+- $Q2.2.new$ : J’ai fait évoluer la pratique de mes activités professionnelles (activité de recherche ou en support de l’activité de recherche) en réponse aux alertes sur le changement climatique.
+
+- $Q2.3.new$ : J’ai déjà évalué tout ou partie de l'empreinte carbone de mon activité professionnelle
+
+- $Q2.4.new$ : Parmi les voyages internationaux professionnels que j'ai effectués ces 5 dernières années, combien étaient indispensables à l’exercice de mon métier ?
+
+- $Q2.5$ : Je me sens encouragé.e par mon institution pour faire évoluer la pratique de mes activités professionnelles en réponse aux alertes sur le changement climatique
+
+- $Q2.6.new$ : Je suis prêt.e à rentrer dans une action collective pour faire changer les choses au CIRAD
+
+- $Q2.7.new$ : Je considère ou j’ai déjà considéré changer de métier ou de thèmes de recherche pour me consacrer à l’urgence climatique
+
+- $Q2.8.new$ : Je considère ou j’ai déjà considéré changer de métier ou de thèmes de recherche pour réduire ma mobilité
+
+- $Q2.9.new$ : J’ai fait évoluer (ou j'ai toujours favorisé) mes pratiques de mobilité vers des moyens doux pour me rendre à mon lieu de travail
+
+- $Q3.1.new$ : Le Cirad doit faire preuve d’exemplarité en réduisant son empreinte environnementale
+
+- $Q3.2.new$ : Le CIRAD doit se doter d’un plan pluri-annuel avec des objectifs chiffrés de réduction de l’impact environnemental de nos activités
+
+- $Q3.3.new$ : La direction / notre hiérarchie doit fortement inciter chacun.e d’entre nous à la réduction des émissions de gaz à effet de serre
+
+- $Q3.4.new$ : Développement des moyens de téléconférence pour devenir une alternative efficace au voyage
+
+- $Q3.5.new$ : Remplacement de l’avion par le train pour tous les déplacements en France métropolitaine, et pour la plupart des déplacements dans les pays européens voisins
+
+- $Q3.6.new$ : Les vols sans escales privilégiés pour les vols internationaux
+
+- $Q3.7.new$ : Les vols longue distance réservés pour des missions d’au moins 4-5 jours sur place
+
+- $Q3.8.new$ : Compensation des émissions de gaz à effet de serre pour les déplacements en avion
+
+- $Q3.9.new$ : Prise en compte de l’impact environnemental des déplacements dans la gestion de la mobilité géographique (expatriation versus mission).
+
+- $Q3.10.new$ : Changements dans les critères d’évaluations de carrière (Ex : moins de poids au nombre de conférences et de séminaires invités, nombre de réunions à haut niveau ; plus de poids aux efforts de réduction des impacts environnementaux de nos activités)
+
+- $Q3.11.new$ : Mise en place d'un système de télé-travail
+
+- $Q3.12.new$ : Mise en place par le Cirad de mesures incitatives pour utiliser des modes de déplacement domicile- travail sobres en carbone
+
+- $Q3.13.new$ : Amélioration de l’impact environnemental de la restauration collective (plus de plats végétariens, augmentation du bio et du local, valorisation des biodéchets, etc)
+
+\section{Questions avec les pourcentages de réponses associées - 364 observations}\label{annexe2}
+
+- $Q1.1$ : L’urgence climatique va exiger des changements profonds dans la pratique de nos métiers de recherche
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q1.1.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q1.2$ : L’organisation, l’évaluation et le financement de la recherche (nationale, européenne, internationale) poussent à des déplacements trop nombreux et inutiles
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q1.2.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.1$ : J'ai fait évoluer mes sujets de recherche en réponse aux alertes sur le changement climatique
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.1.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.2$ : J’ai fait évoluer la pratique de mes activités professionnelles (activité de recherche ou en support de l’activité de recherche) en réponse aux alertes sur le changement climatique
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.2.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.3$ : J’ai déjà évalué tout ou partie de l'empreinte carbone de mon activité professionnelle
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.3.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.4$ : Parmi les voyages internationaux professionnels que j'ai effectués ces 5 dernières années, combien étaient indispensables à l’exercice de mon métier ?
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.4.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.5$ : Je me sens encouragé.e par mon institution pour faire évoluer la pratique de mes activités professionnelles en réponse aux alertes sur le changement climatique
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.5, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.6$ : Je suis prêt.e à rentrer dans une action collective pour faire changer les choses au CIRAD
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.6.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.7$ : Je considère ou j’ai déjà considéré changer de métier ou de thèmes de recherche pour me consacrer à l’urgence climatique
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.7.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.8$ : Je considère ou j’ai déjà considéré changer de métier ou de thèmes de recherche pour réduire ma mobilité
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.8.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q2.9$ : J’ai fait évoluer (ou j'ai toujours favorisé) mes pratiques de mobilité vers des moyens doux pour me rendre à mon lieu de travail
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q2.9.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.1$ : Le Cirad doit faire preuve d’exemplarité en réduisant son empreinte environnementale
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.1.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.2$ : Le CIRAD doit se doter d’un plan pluri-annuel avec des objectifs chiffrés de réduction de l’impact environnemental de nos activités
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.2.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.3$ : La direction / notre hiérarchie doit fortement inciter chacun.e d’entre nous à la réduction des émissions de gaz à effet de serre
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.3.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.4$ : Développement des moyens de téléconférence pour devenir une alternative efficace au voyage
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.4.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.5$ : Remplacement de l’avion par le train pour tous les déplacements en France métropolitaine, et pour la plupart des déplacements dans les pays européens voisins
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.5.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.6$ : Les vols sans escales privilégiés pour les vols internationaux
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.6.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.7$ : Les vols longue distance réservés pour des missions d’au moins 4-5 jours sur place
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.7.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.8$ : Compensation des émissions de gaz à effet de serre pour les déplacements en avion
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.8.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.9$ : Prise en compte de l’impact environnemental des déplacements dans la gestion de la mobilité géographique (expatriation versus mission).
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.9.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.10$ : Changements dans les critères d’évaluations de carrière (Ex : moins de poids au nombre de conférences et de séminaires invités, nombre de réunions à haut niveau ; plus de poids aux efforts de réduction des impacts environnementaux de nos activités)
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.10.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.11$ : Mise en place d'un système de télé-travail
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.11.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.12$ : Mise en place par le Cirad de mesures incitatives pour utiliser des modes de déplacement domicile- travail sobres en carbone
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+freq(enquete4_sans_224_NA.MFA$Q3.12.new, total = TRUE, sort = "inc",digits = 1, exclude = NA)
+```
+
+- $Q3.13$ : Amélioration de l’impact environnemental de la restauration collective (plus de plats végétariens, augmentation du bio et du local, valorisation des biodéchets, etc)
+```{r, include=TRUE, echo=FALSE, fig.align='center'}
+kable(freq(enquete4_sans_224_NA.MFA$Q3.13.new, total = TRUE, sort = "inc",digits = 1, exclude = NA))
+```
+
+
+
+
+
+
+
+
+
+\section{Références}
+
+[1] (https://labos1point5.org/les-enquetes/enquete1-resultat)
+
+[2] (https://eric.univ-lyon2.fr/~ricco/cours/slides/ACM.pdf)
+
+[3] (http://eric.univ-lyon2.fr/~ricco/cours/cours_text_mining.html)
+
+
+
+
+
+
+
